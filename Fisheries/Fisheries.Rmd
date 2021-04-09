@@ -76,7 +76,7 @@ var_name<-var_name%>%
 We have reduced it to the essential variables we shall use to evaluate some of the sea food being monitored by NOAA. 
 
 
-```{r clean, einclude=TRUE, warning=FALSE, message=FALSE}
+```{r clean, include=TRUE, warning=FALSE, message=FALSE}
 
 #The data contains html tags throughout the columns. Clean them out
 cleanFun <- function(htmlString) {
@@ -87,4 +87,43 @@ fish.df<-data.frame(map(fish.df, cleanFun))
 
 ```
 
+```{r pop, include=TRUE, warning=FALSE, message=FALSE}
+#Categorize population
+#Split population column
 
+fish.df2<-fish.df%>%
+  separate(Population,
+           into=c("string1", "string2","string3"),
+           sep="\n")
+fish.df2$string1
+
+fish.df2<-fish.df%>%
+  mutate(pop=ifelse(str_detect(Population, "[Uu]nknown"), "Unknown",
+                    ifelse(str_detect(Population, "[Aa]bove"), "Above",
+                           ifelse(str_detect(Population, "[Aa]bove&[Bb]elow"), "Stable",
+                              ifelse(str_detect(Population, "[Bb]elow|Near"),"Below", NA)))))    
+                           
+
+
+table(fish.df2$pop)
+pop<-fish.df2%>%
+  select(Population, pop)
+
+
+fish.df2<-fish.df%>%
+  mutate(
+    Pop_level=case_when(
+      str_detect(Population, pattern = "[Uu]nknown")~"Unknown",
+      str_detect(Population, pattern = "[Aa]bove")~"Above",
+      is.na(Population)~NA,
+      TRUE ~ "Below"
+    )
+  )
+
+
+pattern="[Uu]nknown"
+sum(str_detect(fish.df$Population, pattern = "([Uu]nknown)"), na.rm = TRUE)
+sum(str_detect(fish.df$Population, pattern = "([Aa]bove)"), na.rm = TRUE)
+sum(str_detect(fish.df$Population, pattern = "([Bb]elow)"), na.rm = TRUE)
+
+```
