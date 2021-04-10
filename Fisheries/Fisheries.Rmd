@@ -17,7 +17,7 @@ This project looks to answer two thing:
 
 
 
-```{r setup, include=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r setup, include=FALSE, results='hide', message=FALSE, warning=FALSE}
 #Loading packages
 library(tidyverse)
 library(ggplot2)
@@ -60,7 +60,7 @@ fish<- function(endpoint) {
   
 }
 
-fish.df<-flatten(fish("/api/species?format=json"))
+fish.df<-as_tibble(flatten(fish("/api/species?format=json")))
 
 #Remain with variables useful in the analysis
 fish.df<-fish.df%>%
@@ -87,16 +87,192 @@ fish.df<-data.frame(map(fish.df, cleanFun))
 
 ```
 
+
+### Fishing and impacts
 ```{r pop, include=TRUE, warning=FALSE, message=FALSE}
 #Categorize population(naive categorization using the first instance of the words "Above", "Unknown" and "Below")
 
 fish.df<-fish.df%>%
-  mutate(pop=ifelse(str_detect(Population, "[Aa]bove"), "Above", 
+  mutate(population=ifelse(str_detect(Population, "[Aa]bove"), "Above target", 
                     ifelse(str_detect(Population, "[Uu]nknown"), "Unknown",
-                           ifelse(str_detect(Population, "[Bb]elow|Near"),"Below", NA))))    
-                           
-table(fish.df$pop)
-pop<-fish.df%>%
-  select(Population, pop)
+                           ifelse(str_detect(Population, "[Bb]elow|Near"),"Below target", NA))))    
+
 
 ```
+
+```{r df1, echo=FALSE}
+
+Fish_Population<-data.frame(table(fish.df$pop))
+Fish_Population<-Fish_Population%>%
+  rename(Population=Var1)%>%
+  rename(Species=Freq)
+Fish_Population
+
+```
+
+
+```{r availability, include=TRUE, warning=FALSE, message=FALSE}
+#Categorize their availability (Annual or seasonal)
+
+fish.df<-fish.df%>%
+  mutate(availability=ifelse(str_detect(Availability, "[Yy]ear-?round"), "Year round", "Seasonal"))    
+
+```
+
+```{r df2, echo=FALSE}
+
+Fish_Availability<-data.frame(table(fish.df$availability))
+Fish_Availability<-Fish_Availability%>%
+  rename(Availability=Var1)%>%
+  rename(Species=Freq)
+Fish_Availability
+
+```
+
+For fish that are caught fresh in long periods of the year i.e. 6-8 months of the year, and are canned or frozen year long, are coded as available year-round. 
+
+
+Fish that are caught on strict seasonal basis e.g. June to October, together with fish that are sporadically caught i.e. Wreckfish, are categorized as seasonal.
+
+
+```{r rate, include=TRUE, warning=FALSE, message=FALSE}
+#Categorize the fishing rates
+##regex to capture overfishing
+rate_regex="i?(closed|prohibited|[Rr]educe(d)?|quota|(rates))"
+
+fish.df<-fish.df%>%
+  mutate(fishing_rate=ifelse(str_detect(Fishing.Rate, "[Rr]ecommended|Not"), "Stable",
+                             ifelse(str_detect(Fishing.Rate,rate_regex),"Over", "Unknown"))) 
+
+```
+
+```{r df3, echo=FALSE}
+
+Fish_rate<-data.frame(table(fish.df$fishing_rate))
+Fish_rate<-Fish_rate%>%
+  rename("Fishing rate"=Var1)%>%
+  rename(Species=Freq)
+Fish_rate
+
+```
+
+How the fishing rates were coded:
+
+
+1.  **Over**: This include species are experiencing a mandated reduced fishing, species that are in regions where authorities have implemented quotas or rates to protect populations or fishing is out-right closed. e.g Sardines
+2.  **Stable**: This include species that that are being fished at "recommended levels" within the fishing regions during the compilation of this data. e.g. Lobster
+3.  **Unknown**: This single observation is for the **California Market Squid** whose fishing rate and populations have not be estimated by NOAA.
+
+
+```{r Env, include=TRUE, warning=FALSE, message=FALSE}
+#Categorize the environmental impact of species
+
+fish.df<-fish.df%>%
+  mutate(env_effects=ifelse(str_detect(Environmental.Effects, "benefits"), "Net benefit",
+                            ifelse(str_detect(Environmental.Effects, "state"), "Federal monitoring",
+                                   "Unknown"))) 
+
+```
+
+```{r df4, echo=FALSE}
+
+Fish_env<-data.frame(table(fish.df$env_effects))
+Fish_env<-Fish_env%>%
+  rename("Environmental Effects"= Var1)%>%
+  rename(Species=Freq)
+Fish_env
+
+```
+
+Unfortunately, not all species have their environmental effects recorded. Oysters, Mussels, Clams and Geoducks have been quoted to have a "**net benefit** on the environment as they remove excess nutrients and improve water quality". Sugar kelp have the same benefits with the additional carbon fixing where they turn carbon-dioxide into oxygen. 
+
+The Atlantic Salmon and Sablefish are being actively monitored by the federal and state authorities to ensure their fishing have minimal impact on the environment. 
+
+
+###  Fish Nutrition
+```{r nutrition, include=TRUE, warning=FALSE, message=FALSE}
+#Convert the columns to numeric and rename to carry their respective units
+
+#Calories column to numeric 
+
+fish.df$Calories<-parse_number(fish.df$Calories) 
+
+#Carbohydrates
+fish.df$Carbohydrate<-parse_number(fish.df$Carbohydrate) 
+
+fish.df<-fish.df%>%
+  rename("carbs (g/ser)" = Carbohydrate)
+
+#Cholesterol
+fish.df$Cholesterol<-parse_number(fish.df$Cholesterol) 
+
+fish.df<-fish.df%>%
+  rename("cholesterol (mg/ser)" = Cholesterol)
+
+#Fat
+fish.df$Fat..Total<-parse_number(fish.df$Fat..Total) 
+
+fish.df<-fish.df%>%
+  rename("fat (g/ser)" = Fat..Total)
+
+#Fiber
+##This column has one value in mg and the rest are in g
+unique(fish.df$Fiber..Total.Dietary)
+
+fish.df$Fiber..Total.Dietary<-parse_number(fish.df$Fiber..Total.Dietary)
+
+##convert the mg value to g
+fish.df$Fiber..Total.Dietary<-ifelse(fish.df$Fiber..Total.Dietary==34, 34/1000, fish.df$Fiber..Total.Dietary)
+fish.df$Fiber..Total.Dietary<-round(fish.df$Fiber..Total.Dietary, 2)
+
+fish.df<-fish.df%>%
+  rename("fiber (g/ser)" = Fiber..Total.Dietary)
+
+#Protein
+fish.df$Protein <-parse_number(fish.df$Protein) 
+
+fish.df<-fish.df%>%
+  rename("protein (g/ser)" = Protein)
+
+#Saturated fat
+fish.df$Saturated.Fatty.Acids..Total <-parse_number(fish.df$Saturated.Fatty.Acids..Total )
+fish.df$Saturated.Fatty.Acids..Total<-round(fish.df$Saturated.Fatty.Acids..Total, 2)
+
+fish.df<-fish.df%>%
+  rename("saturated fatty acids (g/ser)" = Saturated.Fatty.Acids..Total)
+
+#Selenium
+##Some values are in percentage of daily intake and some in mcg
+unique(fish.df$Selenium)
+
+fish.df$Selenium <-parse_number(fish.df$Selenium) 
+fish.df$Selenium<-ifelse(fish.df$Selenium==160, 55*1.6, fish.df$Selenium) #55 mcg is the USA daily intake for adults and children above 14.
+
+fish.df<-fish.df%>%
+  rename("selenium (mcg/ser)" = Selenium)
+
+#Sodium
+fish.df$Sodium <-parse_number(fish.df$Sodium) 
+
+fish.df<-fish.df%>%
+  rename("sodium (mg/ser)" = Sodium)
+
+#Sugars
+fish.df$Sugars..Total <-parse_number(fish.df$Sugars..Total) 
+
+fish.df<-fish.df%>%
+  rename("sugars (g/ser)" = Sugars..Total)
+
+#Serving Weight
+fish.df$Serving.Weight <-parse_number(fish.df$Serving.Weight) 
+
+fish.df<-fish.df%>%
+  rename("serving weights (g)" = Serving.Weight)
+
+
+#lower case
+#fish.df<-fish.df%>%
+ # rename_with(str_to_lower)
+
+```
+
