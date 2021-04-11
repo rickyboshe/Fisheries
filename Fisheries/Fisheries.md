@@ -246,6 +246,8 @@ fish.df<-fish.df%>%
   rename("serving weights (g)" = Serving.Weight)
 ```
 
+### Region with the most fish species
+
 ``` r
 fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))+
   geom_bar()+
@@ -265,12 +267,10 @@ mrg <- list(l = 10, r = 40,
           pad = 0)
 
 fig1<-ggplotly(fig1)%>%layout(margin=mrg)
-fig1
 ```
 
-![](Fisheries_files/figure-gfm/region-1.png)<!-- -->
-
 ``` r
+#Plotly to make the chart more interactive
 fig2<- ggplotly(fig1)%>% add_annotations( text="NOAA Fishery Region", xref="paper", yref="paper",
                   x=1.02, xanchor="left",
                   y=0.9, yanchor="bottom",    # Same y as legend below
@@ -279,4 +279,107 @@ fig2<- ggplotly(fig1)%>% add_annotations( text="NOAA Fishery Region", xref="pape
 fig2
 ```
 
-![](Fisheries_files/figure-gfm/region-2.png)<!-- -->
+<img src="Fisheries_files/figure-gfm/fig2-1.png" style="display: block; margin: auto;" />
+
+## How nutritious is the seafood?
+
+``` r
+#Using the RDA information from US Dietary guidelines. Some are analyzed as a percentage of calories while others are analyzed in absolute amounts.
+
+#a) Dietary guidelines as a percentage of food calories
+fish.df<-fish.df%>%
+  mutate(fat_RDA=`fat (g/ser)`*100/93,
+         s.fat_RDA=`saturated fatty acids (g/ser)`*100/13,
+         carbs_RDA=`carbs (g/ser)`*100/130,
+         sugars_RDA=`sugars (g/ser)`*100/25,
+         protein_RDA=`protein (g/ser)`*100/56)
+
+#b) Dietary guidelines as in absolute amounts
+fish.df<-fish.df%>%
+  mutate(cholesterol_RDA=`cholesterol (mg/ser)`*100/300,
+         fiber_RDA=`fiber (g/ser)`*100/30,
+         sodium_RDA=`sodium (mg/ser)`*100/1300,
+         selenium_RDA=`selenium (mcg/ser)`*100/55)
+
+fish.df<-fish.df %>% 
+  mutate_at(vars(ends_with("RDA")), funs(round(., 2)))
+```
+
+``` r
+fish_longer<-fish.df%>%
+  pivot_longer(cols = c(fat_RDA, s.fat_RDA, carbs_RDA, sugars_RDA, protein_RDA,
+                        cholesterol_RDA, fiber_RDA, sodium_RDA, selenium_RDA),
+               names_to="nutrient",
+               values_to="percent")
+
+
+#Trend of fish calories and their nutrients
+nut.labs<-c("Fat RDA", "Saturated Fatty Acids RDA", "Carbohydrate RDA", "Sugars RDA",
+            "Protein RDA", "Cholesterol RDA", "Dietary Fiber RDA", "Sodium RDA", 
+            "Selenium RDA")
+names(nut.labs)<-c("fat_RDA", "s.fat_RDA", "carbs_RDA", "sugars_RDA", "protein_RDA",
+                    "cholesterol_RDA", "fiber_RDA", "sodium_RDA", "selenium_RDA")
+
+
+fig3<-fish_longer%>%ggplot(aes(x=nutrient, y=percent, color=nutrient))+
+  geom_boxplot()+
+  theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
+        axis.text.x = element_blank(),
+        axis.ticks = element_blank(),
+        legend.title = element_blank(),
+        axis.title.x = element_text(color="black", size=12),
+        axis.title.y = element_text(color="black", size=12))+
+  labs(title="Fish calories and nutritional values \n(percentage RDA)",
+       x= "Nutrient",
+       y= "Percentage RDA")+
+  scale_color_discrete(labels = c("Fat RDA", "Saturated Fatty Acids RDA", "Carbohydrate RDA",
+                                 "Sugars RDA","Protein RDA", "Cholesterol RDA", 
+                                 "Dietary Fiber RDA", "Sodium RDA", "Selenium RDA"))
+fig3
+```
+
+    ## Warning: Removed 9 rows containing non-finite values (stat_boxplot).
+
+<img src="Fisheries_files/figure-gfm/fig3-1.png" style="display: block; margin: auto;" />
+
+``` r
+fig4<-plot_ly(data = fish_longer, x=~nutrient, y =~percent, color =~nutrient, 
+        type = "box") %>% 
+  layout(title="Fish calories and nutritional values \n(percentage RDA)",
+         xaxis = list(title='Nutrient',
+                      ticktext = list("Fat RDA", "Saturated Fatty Acids RDA", "Carbohydrate RDA",
+                                      "Sugars RDA","Protein RDA", "Cholesterol RDA", 
+                                      "Dietary Fiber RDA", "Sodium RDA", "Selenium RDA"), 
+      tickvals = list("fat_RDA", "s.fat_RDA", "carbs_RDA", "sugars_RDA", "protein_RDA",
+                      "cholesterol_RDA", "fiber_RDA", "sodium_RDA", "selenium_RDA"), 
+      yaxis = list(title="Percentage RDA")))
+fig4
+```
+
+    ## Warning: Ignoring 9 observations
+
+    ## Warning in RColorBrewer::brewer.pal(N, "Set2"): n too large, allowed maximum for palette Set2 is 8
+    ## Returning the palette you asked for with that many colors
+    
+    ## Warning in RColorBrewer::brewer.pal(N, "Set2"): n too large, allowed maximum for palette Set2 is 8
+    ## Returning the palette you asked for with that many colors
+
+<img src="Fisheries_files/figure-gfm/fig3-2.png" style="display: block; margin: auto;" />
+
+``` r
+#Plotly to make the chart more interactive
+fig3<- ggplotly(fig3)%>% add_annotations( text="Nutrition", xref="paper", yref="paper",
+                  x=1.02, xanchor="left",
+                  y=0.9, yanchor="bottom",    # Same y as legend below
+                  legendtitle=TRUE, showarrow=FALSE ) %>%
+  layout(legend=list(y=0.9, yanchor="top"),
+          margin=mrg)
+```
+
+    ## Warning: Removed 9 rows containing non-finite values (stat_boxplot).
+
+``` r
+fig3
+```
+
+<img src="Fisheries_files/figure-gfm/nut-1.png" style="display: block; margin: auto;" />
