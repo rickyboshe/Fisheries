@@ -52,7 +52,6 @@ fish<- function(endpoint) {
   if(http_type(response)!="application/json"){
     stop("API did not return json", call. = FALSE)
   }
-  
   #Get content as text
   json_text<- content(response, as="text")
   dataframe<-fromJSON(json_text)
@@ -77,7 +76,6 @@ We have reduced it to the essential variables we shall use to evaluate some of t
 
 
 ```{r clean, include=TRUE, warning=FALSE, message=FALSE}
-
 #The data contains html tags throughout the columns. Clean them out
 cleanFun <- function(htmlString) {
   return(gsub("<.*?>", "", htmlString))
@@ -91,7 +89,6 @@ fish.df<-data.frame(map(fish.df, cleanFun))
 ### Fishing and impacts
 ```{r pop, include=TRUE, warning=FALSE, message=FALSE}
 #Categorize population(naive categorization using the first instance of the words "Above", "Unknown" and "Below")
-
 fish.df<-fish.df%>%
   mutate(population=ifelse(str_detect(Population, "[Aa]bove"), "Above target", 
                     ifelse(str_detect(Population, "[Uu]nknown"), "Unknown",
@@ -101,7 +98,6 @@ fish.df<-fish.df%>%
 ```
 
 ```{r df1, echo=FALSE}
-
 Fish_Population<-data.frame(table(fish.df$pop))
 Fish_Population<-Fish_Population%>%
   rename(Population=Var1)%>%
@@ -113,7 +109,6 @@ Fish_Population
 
 ```{r availability, include=TRUE, warning=FALSE, message=FALSE}
 #Categorize their availability (Annual or seasonal)
-
 fish.df<-fish.df%>%
   mutate(availability=ifelse(str_detect(Availability, "[Yy]ear-?round"), "Year round", "Seasonal"))    
 
@@ -139,7 +134,6 @@ Fish that are caught on strict seasonal basis e.g. June to October, together wit
 #Categorize the fishing rates
 ##regex to capture overfishing
 rate_regex="i?(closed|prohibited|[Rr]educe(d)?|quota|(rates))"
-
 fish.df<-fish.df%>%
   mutate(fishing_rate=ifelse(str_detect(Fishing.Rate, "[Rr]ecommended|Not"), "Stable",
                              ifelse(str_detect(Fishing.Rate,rate_regex),"Over", "Unknown"))) 
@@ -147,7 +141,6 @@ fish.df<-fish.df%>%
 ```
 
 ```{r df3, echo=FALSE}
-
 Fish_rate<-data.frame(table(fish.df$fishing_rate))
 Fish_rate<-Fish_rate%>%
   rename("Fishing rate"=Var1)%>%
@@ -166,7 +159,6 @@ How the fishing rates were coded:
 
 ```{r Env, include=TRUE, warning=FALSE, message=FALSE}
 #Categorize the environmental impact of species
-
 fish.df<-fish.df%>%
   mutate(env_effects=ifelse(str_detect(Environmental.Effects, "benefits"), "Net benefit",
                             ifelse(str_detect(Environmental.Effects, "state"), "Federal monitoring",
@@ -192,33 +184,27 @@ The Atlantic Salmon and Sablefish are being actively monitored by the federal an
 ###  Fish Nutrition
 ```{r nutrition, include=TRUE, warning=FALSE, message=FALSE}
 #Convert the columns to numeric and rename to carry their respective units
-
 #Calories column to numeric 
-
 fish.df$Calories<-parse_number(fish.df$Calories) 
 
 #Carbohydrates
 fish.df$Carbohydrate<-parse_number(fish.df$Carbohydrate) 
-
 fish.df<-fish.df%>%
   rename("carbs (g/ser)" = Carbohydrate)
 
 #Cholesterol
 fish.df$Cholesterol<-parse_number(fish.df$Cholesterol) 
-
 fish.df<-fish.df%>%
   rename("cholesterol (mg/ser)" = Cholesterol)
 
 #Fat
 fish.df$Fat..Total<-parse_number(fish.df$Fat..Total) 
-
 fish.df<-fish.df%>%
   rename("fat (g/ser)" = Fat..Total)
 
 #Fiber
 ##This column has one value in mg and the rest are in g
 unique(fish.df$Fiber..Total.Dietary)
-
 fish.df$Fiber..Total.Dietary<-parse_number(fish.df$Fiber..Total.Dietary)
 
 ##convert the mg value to g
@@ -230,21 +216,18 @@ fish.df<-fish.df%>%
 
 #Protein
 fish.df$Protein <-parse_number(fish.df$Protein) 
-
 fish.df<-fish.df%>%
   rename("protein (g/ser)" = Protein)
 
 #Saturated fat
 fish.df$Saturated.Fatty.Acids..Total <-parse_number(fish.df$Saturated.Fatty.Acids..Total )
 fish.df$Saturated.Fatty.Acids..Total<-round(fish.df$Saturated.Fatty.Acids..Total, 2)
-
 fish.df<-fish.df%>%
   rename("saturated fatty acids (g/ser)" = Saturated.Fatty.Acids..Total)
 
 #Selenium
 ##Some values are in percentage of daily intake and some in mcg
 unique(fish.df$Selenium)
-
 fish.df$Selenium <-parse_number(fish.df$Selenium) 
 fish.df$Selenium<-ifelse(fish.df$Selenium==160, 55*1.6, fish.df$Selenium) #55 mcg is the USA daily intake for adults and children above 14.
 
@@ -253,19 +236,16 @@ fish.df<-fish.df%>%
 
 #Sodium
 fish.df$Sodium <-parse_number(fish.df$Sodium) 
-
 fish.df<-fish.df%>%
   rename("sodium (mg/ser)" = Sodium)
 
 #Sugars
 fish.df$Sugars..Total <-parse_number(fish.df$Sugars..Total) 
-
 fish.df<-fish.df%>%
   rename("sugars (g/ser)" = Sugars..Total)
 
 #Serving Weight
 fish.df$Serving.Weight <-parse_number(fish.df$Serving.Weight) 
-
 fish.df<-fish.df%>%
   rename("serving weights (g)" = Serving.Weight)
 
@@ -290,21 +270,31 @@ fish.df<-fish.df%>%
 
 
 ```{r region, include=TRUE, fig.height= 5, fig.width= 10 }
-table(fish.df$noaa.fisheries.region)
-
 fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))+
   geom_bar()+
   theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
         axis.text.x = element_blank(),
         axis.ticks = element_blank(),
+        legend.title = element_blank(),
         axis.title.x = element_text(color="black", size=12, face="bold"),
         axis.title.y = element_text(color="black", size=12, face="bold"))+
   scale_y_continuous(expand = c(0, 0))+
   labs(title = "Distribution of fish species within \nNOAA fisheries regions",
        x="Region",
-       y="No of Species",
-       fill="NOAA Fishery Region")
-fig1<-ggplotly(fig1)
+       y="No of Species")
+
+mrg <- list(l = 10, r = 40,
+          b = 15, t = 100,
+          pad = 0)
+
+fig1<-ggplotly(fig1)%>%layout(margin=mrg)
 fig1
+
+fig2<- ggplotly(fig1)%>% add_annotations( text="NOAA Fishery Region", xref="paper", yref="paper",
+                  x=1.02, xanchor="left",
+                  y=0.9, yanchor="bottom",    # Same y as legend below
+                  legendtitle=TRUE, showarrow=FALSE ) %>%
+  layout( legend=list(y=0.9, yanchor="top" ) )
+fig2
 
 ```

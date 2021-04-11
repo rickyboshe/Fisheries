@@ -46,7 +46,6 @@ fish<- function(endpoint) {
   if(http_type(response)!="application/json"){
     stop("API did not return json", call. = FALSE)
   }
-  
   #Get content as text
   json_text<- content(response, as="text")
   dataframe<-fromJSON(json_text)
@@ -80,7 +79,6 @@ fish.df<-data.frame(map(fish.df, cleanFun))
 
 ``` r
 #Categorize population(naive categorization using the first instance of the words "Above", "Unknown" and "Below")
-
 fish.df<-fish.df%>%
   mutate(population=ifelse(str_detect(Population, "[Aa]bove"), "Above target", 
                     ifelse(str_detect(Population, "[Uu]nknown"), "Unknown",
@@ -94,7 +92,6 @@ fish.df<-fish.df%>%
 
 ``` r
 #Categorize their availability (Annual or seasonal)
-
 fish.df<-fish.df%>%
   mutate(availability=ifelse(str_detect(Availability, "[Yy]ear-?round"), "Year round", "Seasonal"))    
 ```
@@ -115,7 +112,6 @@ categorized as seasonal.
 #Categorize the fishing rates
 ##regex to capture overfishing
 rate_regex="i?(closed|prohibited|[Rr]educe(d)?|quota|(rates))"
-
 fish.df<-fish.df%>%
   mutate(fishing_rate=ifelse(str_detect(Fishing.Rate, "[Rr]ecommended|Not"), "Stable",
                              ifelse(str_detect(Fishing.Rate,rate_regex),"Over", "Unknown"))) 
@@ -143,7 +139,6 @@ How the fishing rates were coded:
 
 ``` r
 #Categorize the environmental impact of species
-
 fish.df<-fish.df%>%
   mutate(env_effects=ifelse(str_detect(Environmental.Effects, "benefits"), "Net benefit",
                             ifelse(str_detect(Environmental.Effects, "state"), "Federal monitoring",
@@ -168,26 +163,21 @@ impact on the environment.
 
 ``` r
 #Convert the columns to numeric and rename to carry their respective units
-
 #Calories column to numeric 
-
 fish.df$Calories<-parse_number(fish.df$Calories) 
 
 #Carbohydrates
 fish.df$Carbohydrate<-parse_number(fish.df$Carbohydrate) 
-
 fish.df<-fish.df%>%
   rename("carbs (g/ser)" = Carbohydrate)
 
 #Cholesterol
 fish.df$Cholesterol<-parse_number(fish.df$Cholesterol) 
-
 fish.df<-fish.df%>%
   rename("cholesterol (mg/ser)" = Cholesterol)
 
 #Fat
 fish.df$Fat..Total<-parse_number(fish.df$Fat..Total) 
-
 fish.df<-fish.df%>%
   rename("fat (g/ser)" = Fat..Total)
 
@@ -210,14 +200,12 @@ fish.df<-fish.df%>%
 
 #Protein
 fish.df$Protein <-parse_number(fish.df$Protein) 
-
 fish.df<-fish.df%>%
   rename("protein (g/ser)" = Protein)
 
 #Saturated fat
 fish.df$Saturated.Fatty.Acids..Total <-parse_number(fish.df$Saturated.Fatty.Acids..Total )
 fish.df$Saturated.Fatty.Acids..Total<-round(fish.df$Saturated.Fatty.Acids..Total, 2)
-
 fish.df<-fish.df%>%
   rename("saturated fatty acids (g/ser)" = Saturated.Fatty.Acids..Total)
 
@@ -244,38 +232,19 @@ fish.df<-fish.df%>%
 
 #Sodium
 fish.df$Sodium <-parse_number(fish.df$Sodium) 
-
 fish.df<-fish.df%>%
   rename("sodium (mg/ser)" = Sodium)
 
 #Sugars
 fish.df$Sugars..Total <-parse_number(fish.df$Sugars..Total) 
-
 fish.df<-fish.df%>%
   rename("sugars (g/ser)" = Sugars..Total)
 
 #Serving Weight
 fish.df$Serving.Weight <-parse_number(fish.df$Serving.Weight) 
-
 fish.df<-fish.df%>%
   rename("serving weights (g)" = Serving.Weight)
 ```
-
-``` r
-table(fish.df$noaa.fisheries.region)
-```
-
-    ## 
-    ##                                  Alaska                        Greater Atlantic 
-    ##                                       5                                      27 
-    ##             Greater Atlantic, Southeast                         Pacific Islands 
-    ##                                      19                                       2 
-    ##                               Southeast                              West Coast 
-    ##                                      17                                      10 
-    ##                      West Coast, Alaska    West Coast, Greater Atlantic, Alaska 
-    ##                                      22                                       1 
-    ## West Coast, Greater Atlantic, Southeast             West Coast, Pacific Islands 
-    ##                                       2                                       9
 
 ``` r
 fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))+
@@ -283,15 +252,31 @@ fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))
   theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
         axis.text.x = element_blank(),
         axis.ticks = element_blank(),
+        legend.title = element_blank(),
         axis.title.x = element_text(color="black", size=12, face="bold"),
         axis.title.y = element_text(color="black", size=12, face="bold"))+
   scale_y_continuous(expand = c(0, 0))+
   labs(title = "Distribution of fish species within \nNOAA fisheries regions",
        x="Region",
-       y="No of Species",
-       fill="NOAA Fishery Region")
-fig1<-ggplotly(fig1)
+       y="No of Species")
+
+mrg <- list(l = 10, r = 40,
+          b = 15, t = 100,
+          pad = 0)
+
+fig1<-ggplotly(fig1)%>%layout(margin=mrg)
 fig1
 ```
 
 ![](Fisheries_files/figure-gfm/region-1.png)<!-- -->
+
+``` r
+fig2<- ggplotly(fig1)%>% add_annotations( text="NOAA Fishery Region", xref="paper", yref="paper",
+                  x=1.02, xanchor="left",
+                  y=0.9, yanchor="bottom",    # Same y as legend below
+                  legendtitle=TRUE, showarrow=FALSE ) %>%
+  layout( legend=list(y=0.9, yanchor="top" ) )
+fig2
+```
+
+![](Fisheries_files/figure-gfm/region-2.png)<!-- -->
