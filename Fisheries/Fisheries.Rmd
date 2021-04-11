@@ -270,9 +270,45 @@ fish.df<-fish.df%>%
   rename("serving weights (g)" = Serving.Weight)
 
 
-#lower case
-#fish.df<-fish.df%>%
- # rename_with(str_to_lower)
+```
+
+```{r clean, include=FALSE}
+
+#remove redundant columns
+fish.df<-fish.df%>%
+  select(-Habitat, -Population, -Availability, -Environmental.Effects)
+
+
+#lower case column names
+fish.df<-fish.df%>%
+  rename_with(str_to_lower)
+
 
 ```
 
+
+
+
+
+```{r region, include=TRUE  }
+table(fish.df$noaa.fisheries.region)
+
+fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))+
+  geom_bar()+
+  theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
+        axis.text.x = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_text(color="black", size=12, face="bold"),
+        axis.title.y = element_text(color="black", size=12, face="bold"))+
+  scale_y_continuous(expand = c(0, 0))+
+  labs(title = "Distribution of fish species within \nNOAA fisheries regions",
+       x="Region",
+       y="No of Species",
+       fill="NOAA Fishery Region")
+fig1<-ggplotly(fig1)
+fig1
+
+
+
+
+```
