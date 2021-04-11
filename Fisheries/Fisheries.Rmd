@@ -272,7 +272,7 @@ fish.df<-fish.df%>%
 
 ```
 
-```{r clean, include=FALSE}
+```{r mutate, include=FALSE}
 
 #remove redundant columns
 fish.df<-fish.df%>%
@@ -289,8 +289,7 @@ fish.df<-fish.df%>%
 
 
 
-
-```{r region, include=TRUE  }
+```{r region, include=TRUE, fig.height= 5, fig.width= 10 }
 table(fish.df$noaa.fisheries.region)
 
 fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))+
@@ -307,8 +306,5 @@ fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))
        fill="NOAA Fishery Region")
 fig1<-ggplotly(fig1)
 fig1
-
-
-
 
 ```

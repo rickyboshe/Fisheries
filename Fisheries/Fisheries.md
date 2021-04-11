@@ -259,9 +259,39 @@ fish.df$Serving.Weight <-parse_number(fish.df$Serving.Weight)
 
 fish.df<-fish.df%>%
   rename("serving weights (g)" = Serving.Weight)
-
-
-#lower case
-#fish.df<-fish.df%>%
- # rename_with(str_to_lower)
 ```
+
+``` r
+table(fish.df$noaa.fisheries.region)
+```
+
+    ## 
+    ##                                  Alaska                        Greater Atlantic 
+    ##                                       5                                      27 
+    ##             Greater Atlantic, Southeast                         Pacific Islands 
+    ##                                      19                                       2 
+    ##                               Southeast                              West Coast 
+    ##                                      17                                      10 
+    ##                      West Coast, Alaska    West Coast, Greater Atlantic, Alaska 
+    ##                                      22                                       1 
+    ## West Coast, Greater Atlantic, Southeast             West Coast, Pacific Islands 
+    ##                                       2                                       9
+
+``` r
+fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))+
+  geom_bar()+
+  theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
+        axis.text.x = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_text(color="black", size=12, face="bold"),
+        axis.title.y = element_text(color="black", size=12, face="bold"))+
+  scale_y_continuous(expand = c(0, 0))+
+  labs(title = "Distribution of fish species within \nNOAA fisheries regions",
+       x="Region",
+       y="No of Species",
+       fill="NOAA Fishery Region")
+fig1<-ggplotly(fig1)
+fig1
+```
+
+![](Fisheries_files/figure-gfm/region-1.png)<!-- -->
