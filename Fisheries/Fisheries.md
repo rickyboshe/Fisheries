@@ -17,7 +17,7 @@ diet”](https://www.medicalnewstoday.com/articles/323907#:~:text=What%20is%20a%
 
 This project looks to answer two thing:
 
-1.  But is sea food environmentally sustainable?
+1.  Is seafood environmentally sustainable?
 2.  Does it pack the nutrients to replace red meat diet?
 
 We shall be utilizing the fisheries management dataset from the
@@ -28,7 +28,7 @@ using their **FishWatch API**.
 This is my first time attempting to work with APIs to access data. A
 learning curve.
 
-#### Acessing the data
+### Acessing the data
 
 ``` r
 #Create a function to request the endpoint and receive a dataframe converted from JSON
@@ -75,7 +75,7 @@ cleanFun <- function(htmlString) {
 fish.df<-data.frame(map(fish.df, cleanFun))
 ```
 
-### Fishing and impacts
+### Data Cleaning and Manipulation
 
 ``` r
 #Categorize population(naive categorization using the first instance of the words "Above", "Unknown" and "Below")
@@ -102,11 +102,11 @@ fish.df<-fish.df%>%
 
 For fish that are caught fresh in long periods of the year i.e. 6-8
 months of the year, and are canned or frozen year long, are coded as
-available year-round.
+available **year-round**.
 
 Fish that are caught on strict seasonal basis e.g. June to October,
 together with fish that are sporadically caught i.e. Wreckfish, are
-categorized as seasonal.
+categorized as **seasonal**.
 
 ``` r
 #Categorize the fishing rates
@@ -141,8 +141,8 @@ How the fishing rates were coded:
 #Categorize the environmental impact of species
 fish.df<-fish.df%>%
   mutate(env_effects=ifelse(str_detect(Environmental.Effects, "benefits"), "Net benefit",
-                            ifelse(str_detect(Environmental.Effects, "state"), "Federal monitoring",
-                                   "Unknown"))) 
+                            ifelse(str_detect(Environmental.Effects, "state"), 
+                                   "Federal monitoring","Unknown"))) 
 ```
 
     ##   Environmental Effects Species
@@ -159,7 +159,7 @@ The Atlantic Salmon and Sablefish are being actively monitored by the
 federal and state authorities to ensure their fishing have minimal
 impact on the environment.
 
-### Fish Nutrition
+#### Fish Nutrition
 
 ``` r
 #Convert the columns to numeric and rename to carry their respective units
@@ -246,7 +246,7 @@ fish.df<-fish.df%>%
   rename("serving weights (g)" = Serving.Weight)
 ```
 
-### Region with the most fish species
+### Regional Fishing
 
 ``` r
 fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))+
@@ -271,23 +271,82 @@ fig1<-ggplotly(fig1)%>%layout(margin=mrg)
 ```
 
 <img src="Fisheries_files/figure-gfm/fig2-1.png" style="display: block; margin: auto;" />
+<br></br> The most species are found in the Greater Atlantic area while
+the least are found in the Pacific Island fishery region.
 
-## How nutritious is the seafood?
+This means chances are, most of the fish people consume in the US comes
+from the Greater Atlantic area\! But does this mean the region is
+subject to over fishing?
+
+### Regional Fishing Rates
+
+We can examine how the fishing rates are in every region in the US. The
+goal is to identify regions that are experiencing over fishing or are
+within recommended fishing levels.
 
 ``` r
-#Using the RDA information from US Dietary guidelines. Some are analyzed as a percentage of calories while others are analyzed in absolute amounts.
+#Availability vs Fishing rate
+plotdata <- fish.df%>%
+  drop_na(fishing_rate)%>%
+  group_by(noaa.fisheries.region, fishing_rate)%>%
+  summarize(n = n())%>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
 
+fig2<-plotdata%>%
+  ggplot(aes(x=noaa.fisheries.region, y=pct, fill=fishing_rate))+
+  geom_bar(stat = "identity", position = "fill")+
+  theme_minimal()+
+  theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
+        axis.ticks = element_blank(),
+        legend.title = element_blank(),
+        axis.title.x = element_text(color="black", size=12, face="bold"),
+        axis.title.y = element_text(color="black", size=12, face="bold"))+
+  scale_y_continuous(breaks = seq(0, 1, .2),label = percent)+
+  geom_text(aes(label = lbl), size = 3, 
+            position = position_stack(vjust = 0.5))+
+  labs(title = "Fishing Rate by Fishing Region",
+       x="",
+       y="Percent")
+
+#Plotly to make the chart more interactive
+fig2<- ggplotly(fig2)%>% add_annotations( text="Fishing Rate", 
+                                            xref="paper", yref="paper",
+                                            x=1.02, xanchor="left",
+                                            y=0.9, yanchor="bottom",
+                                            legendtitle=TRUE, showarrow=FALSE )%>%
+  layout(legend=list(y=0.9, yanchor="top"),xaxis=list(tickangle=-45))%>%
+  style(hoverinfo = 'none')
+
+fig2
+```
+
+<img src="Fisheries_files/figure-gfm/env-1.png" style="display: block; margin: auto;" />
+
+The majority of fishing regions are experiencing stable fishing rates,
+well within recommended levels for existing populations. The Greater
+Atlantic fishing zone has the highest levels of over fishing as compared
+to the other regions (20%).
+
+<br></br>
+
+|                                                         Blue Mussel                                                         |                                                                                                                                                          Sable Fish                                                                                                                                                          |
+| :-------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|    <img src="https://www.fishwatch.gov/sites/default/files/blue_mussel.png" alt="blue mussel" width="600" height="150"/>    |                                                                                              <img align="center" src="https://www.fishwatch.gov/sites/default/files/sablefish.png" alt="sable fish" width="400" height="100"/>                                                                                               |
+| The blue mussel has been observed to have a net benefit on the environment while boasting rich levels of protein (21% RDA). | The sable fish is available year round and is a great source for protein (24% RDA), low on carbs (0% RDA) and sodium (4% RDA). But the species is under monitoring from federal and state authorities to ensure its fishing has minimal impact on the environment. It also has relatively high levels of selenium (66% RDA). |
+
+### How nutritious is seafood?
+
+``` r
+#Using the RDA information from US Dietary guidelines. 
 #a) Dietary guidelines as a percentage of food calories
 fish.df<-fish.df%>%
   mutate(fat_RDA=`fat (g/ser)`*100/93,
          s.fat_RDA=`saturated fatty acids (g/ser)`*100/13,
          carbs_RDA=`carbs (g/ser)`*100/130,
          sugars_RDA=`sugars (g/ser)`*100/25,
-         protein_RDA=`protein (g/ser)`*100/56)
-
-#b) Dietary guidelines as in absolute amounts
-fish.df<-fish.df%>%
-  mutate(cholesterol_RDA=`cholesterol (mg/ser)`*100/300,
+         protein_RDA=`protein (g/ser)`*100/56,
+         cholesterol_RDA=`cholesterol (mg/ser)`*100/300,
          fiber_RDA=`fiber (g/ser)`*100/30,
          sodium_RDA=`sodium (mg/ser)`*100/1300,
          selenium_RDA=`selenium (mcg/ser)`*100/55)
@@ -373,4 +432,22 @@ not be the ideal dish for you.
 
 <br></br>
 
+<center>
+
+##### How do fish calories compare to fat, saturated fatty acids, carbs and protein?
+
+</center>
+
 <img src="Fisheries_files/figure-gfm/quadrant-1.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant-2.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant-3.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant-4.png" style="display: block; margin: auto;" />
+
+Above graphs depict a **nutritional value quadrant** for the fish
+species found within the NOAA region. For all intents and purposes, the
+species found in **quadrant 1** in each graph have the best value for
+calories and their respective nutritional component.
+
+As human diet differ across communities, some might be looking for
+different levels of nutrients. It is important to be aware of how
+calories relate to your diet of choice. Also to debunk any misguided
+information one might have had prior.
+
+<br></br>
