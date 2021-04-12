@@ -251,6 +251,7 @@ fish.df<-fish.df%>%
 ``` r
 fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))+
   geom_bar()+
+  theme_minimal()+
   theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
         axis.text.x = element_blank(),
         axis.ticks = element_blank(),
@@ -267,16 +268,6 @@ mrg <- list(l = 10, r = 40,
           pad = 0)
 
 fig1<-ggplotly(fig1)%>%layout(margin=mrg)
-```
-
-``` r
-#Plotly to make the chart more interactive
-fig2<- ggplotly(fig1)%>% add_annotations( text="NOAA Fishery Region", xref="paper", yref="paper",
-                  x=1.02, xanchor="left",
-                  y=0.9, yanchor="bottom",    # Same y as legend below
-                  legendtitle=TRUE, showarrow=FALSE ) %>%
-  layout( legend=list(y=0.9, yanchor="top" ) )
-fig2
 ```
 
 <img src="Fisheries_files/figure-gfm/fig2-1.png" style="display: block; margin: auto;" />
@@ -306,80 +297,80 @@ fish.df<-fish.df %>%
 ```
 
 ``` r
-fish_longer<-fish.df%>%
-  pivot_longer(cols = c(fat_RDA, s.fat_RDA, carbs_RDA, sugars_RDA, protein_RDA,
-                        cholesterol_RDA, fiber_RDA, sodium_RDA, selenium_RDA),
-               names_to="nutrient",
-               values_to="percent")
-
-
-#Trend of fish calories and their nutrients
-nut.labs<-c("Fat RDA", "Saturated Fatty Acids RDA", "Carbohydrate RDA", "Sugars RDA",
-            "Protein RDA", "Cholesterol RDA", "Dietary Fiber RDA", "Sodium RDA", 
-            "Selenium RDA")
-names(nut.labs)<-c("fat_RDA", "s.fat_RDA", "carbs_RDA", "sugars_RDA", "protein_RDA",
-                    "cholesterol_RDA", "fiber_RDA", "sodium_RDA", "selenium_RDA")
-
-
-fig3<-fish_longer%>%ggplot(aes(x=nutrient, y=percent, color=nutrient))+
-  geom_boxplot()+
-  theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
-        axis.text.x = element_blank(),
-        axis.ticks = element_blank(),
-        legend.title = element_blank(),
-        axis.title.x = element_text(color="black", size=12),
-        axis.title.y = element_text(color="black", size=12))+
-  labs(title="Fish calories and nutritional values \n(percentage RDA)",
-       x= "Nutrient",
-       y= "Percentage RDA")+
-  scale_color_discrete(labels = c("Fat RDA", "Saturated Fatty Acids RDA", "Carbohydrate RDA",
-                                 "Sugars RDA","Protein RDA", "Cholesterol RDA", 
-                                 "Dietary Fiber RDA", "Sodium RDA", "Selenium RDA"))
-fig3
-```
-
-    ## Warning: Removed 9 rows containing non-finite values (stat_boxplot).
-
-<img src="Fisheries_files/figure-gfm/fig3-1.png" style="display: block; margin: auto;" />
-
-``` r
 fig4<-plot_ly(data = fish_longer, x=~nutrient, y =~percent, color =~nutrient, 
-        type = "box") %>% 
-  layout(title="Fish calories and nutritional values \n(percentage RDA)",
-         xaxis = list(title='Nutrient',
-                      ticktext = list("Fat RDA", "Saturated Fatty Acids RDA", "Carbohydrate RDA",
-                                      "Sugars RDA","Protein RDA", "Cholesterol RDA", 
-                                      "Dietary Fiber RDA", "Sodium RDA", "Selenium RDA"), 
+        type = "box", textposition = "auto", hoverinfo = "text",
+        hovertext = paste("Species :", fish_longer$species.name,"<br> RDA :", 
+                          fish_longer$percent))%>% 
+  layout(title="<b>Fish calories and nutritional values \n(percentage RDA)<b>",
+         xaxis = list(title='',
+                      ticktext = list("Fat", "Saturated Fatty Acids", "Carbohydrate",
+                                      "Sugars","Protein", "Cholesterol", 
+                                      "Dietary Fiber", "Sodium", "Selenium"), 
       tickvals = list("fat_RDA", "s.fat_RDA", "carbs_RDA", "sugars_RDA", "protein_RDA",
-                      "cholesterol_RDA", "fiber_RDA", "sodium_RDA", "selenium_RDA"), 
-      yaxis = list(title="Percentage RDA")))
+                      "cholesterol_RDA", "fiber_RDA", "sodium_RDA", "selenium_RDA"),
+      tickangle = -45),
+      yaxis = list(title='Percentage RDA'))%>%
+  hide_legend()
 fig4
 ```
 
-    ## Warning: Ignoring 9 observations
+<img src="Fisheries_files/figure-gfm/fig4-1.png" style="display: block; margin: auto;" />
 
-    ## Warning in RColorBrewer::brewer.pal(N, "Set2"): n too large, allowed maximum for palette Set2 is 8
-    ## Returning the palette you asked for with that many colors
-    
-    ## Warning in RColorBrewer::brewer.pal(N, "Set2"): n too large, allowed maximum for palette Set2 is 8
-    ## Returning the palette you asked for with that many colors
+It looks like most fish species are rich in protein, selenium and
+cholesterol. With the exception of Atlantic Bigeye Tuna and Pacific Blue
+Marin, all fish species have nutrients that are within the recommended
+dietary allowance in the USA.
 
-<img src="Fisheries_files/figure-gfm/fig3-2.png" style="display: block; margin: auto;" />
-
-``` r
-#Plotly to make the chart more interactive
-fig3<- ggplotly(fig3)%>% add_annotations( text="Nutrition", xref="paper", yref="paper",
-                  x=1.02, xanchor="left",
-                  y=0.9, yanchor="bottom",    # Same y as legend below
-                  legendtitle=TRUE, showarrow=FALSE ) %>%
-  layout(legend=list(y=0.9, yanchor="top"),
-          margin=mrg)
-```
-
-    ## Warning: Removed 9 rows containing non-finite values (stat_boxplot).
+All species show very low amounts of sugars, fat and saturated fatty
+acids, which is good for heart health. For anyone looking for a low carb
+diet, fish is the answer. They have very low carbohydrate per serving.
 
 ``` r
-fig3
+#Trend of fish calories and their nutrients
+nut.labs<-c("Fat", "Saturated Fatty Acids", "Carbohydrate", "Sugars",
+            "Protein", "Cholesterol", "Dietary Fiber", "Sodium", "Selenium")
+names(nut.labs)<-c("fat_RDA", "s.fat_RDA", "carbs_RDA", "sugars_RDA", "protein_RDA",
+                    "cholesterol_RDA", "fiber_RDA", "sodium_RDA", "selenium_RDA")
+
+fig6<-fish_longer%>%ggplot(aes(x=calories, y=percent, color=nutrient, group=species))+
+  geom_point(shape=1)+
+  theme_minimal()+
+  theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
+        legend.title = element_blank(),
+        axis.title.x = element_text(color="black", size=12),
+        axis.title.y = element_text(color="black", size=12),
+        panel.spacing.y = unit(1, "lines"))+
+    labs(title="Relationship between Calories and Nutrients",
+       x= "Calories",
+       y= "Percentage RDA")+
+  facet_wrap(~nutrient, labeller = labeller(nutrient=nut.labs),
+             scales="free_y")
+
+mrg2 <- list(l = 10, r = 40,
+          b = 10, t = 100,
+          pad = 0)
+
+fig6<- ggplotly(fig6, tooltip = c("species"))%>%
+  layout(margin=mrg2)%>%
+  hide_legend()
+
+fig6
 ```
 
-<img src="Fisheries_files/figure-gfm/nut-1.png" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/quad-1.png" style="display: block; margin: auto;" />
+
+It would appear that the calories of fish have weak negative
+relationship with the amount of carbohydrates and sugars. While there is
+no significant relationship between fish calories with dietary fibers,
+cholesterol and selenium. But there is a strong relationship between
+fish calories and Fat (r = 0.91), Saturated fat (r = 0.90) and Protein
+(r = 0.39).
+
+So for people trying to avoid fat and saturated fatty acids, fish might
+not be the ideal dish for you.
+
+<img src="Fisheries_files/figure-gfm/corr-1.png" style="display: block; margin: auto;" />
+
+<br></br>
+
+<img src="Fisheries_files/figure-gfm/quadrant-1.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant-2.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant-3.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant-4.png" style="display: block; margin: auto;" />
