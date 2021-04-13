@@ -12,8 +12,46 @@ diet”](https://www.medicalnewstoday.com/articles/323907#:~:text=What%20is%20a%
 
 This project looks to answer two thing:
 
-1.  But is sea food environmentally sustainable?
+1.  Is seafood environmentally sustainable?
 2.  Does it pack the nutrients to replace red meat diet?
+3.  
+###  The full project with **code** can be found [here.](https://github.com/rickyboshe/Fisheries/blob/main/Fisheries/Fisheries.md)
+
+#  Summary
+According to the data from
+[National Oceanic and Atmostpheric Administration
+(NOAA)](https://www.fishwatch.gov/resources) seafood fishing has been mostly within recommended levels across fishery regions in the US.
+
+<p align="center">
+  
+<img src="Fisheries/Fisheries_files/figure-gfm/env-1.png" style="display: block; margin: auto;" height="500" />
+
+</p>
+
+The majority of fishing regions are experiencing stable fishing rates,
+well within recommended levels for existing populations. The Greater
+Atlantic fishing zone has the highest levels of over fishing as compared
+to the other regions (20%).
+
+As some private companies are also embarking on fish farming to preserve communities, some of the species have been observed to have a net benefit to the environment. 
 
 
-The full project with code can be found [here.](https://github.com/rickyboshe/Fisheries/blob/main/Fisheries/Fisheries.md)
+|                                                         Blue Mussel                                                         |                                                                                                                                                          Sable Fish                                                                                                                                                          |
+| :-------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|    <img src="https://www.fishwatch.gov/sites/default/files/blue_mussel.png" alt="blue mussel" width="600" height="150"/>    |                                                                                              <img align="center" src="https://www.fishwatch.gov/sites/default/files/sablefish.png" alt="sable fish" width="400" height="100"/>                                                                                               |
+| The blue mussel has been observed to have a net benefit on the environment while boasting rich levels of protein (21% RDA). | The sable fish is available year round and is a great source for protein (24% RDA), low on carbs (0% RDA) and sodium (4% RDA). But the species is under monitoring from federal and state authorities to ensure its fishing has minimal impact on the environment. It also has relatively high levels of selenium (66% RDA). |
+
+When it comes to nutriotion and calories of seafood, It looks like most fish species are rich in protein, selenium and
+cholesterol. With the exception of Atlantic Bigeye Tuna and Pacific Blue
+Marin, all fish species have nutrients that are within the recommended
+dietary allowance in the USA.
+
+<p align="center">
+<img src="Fisheries/Fisheries_files/figure-gfm/fig4-1.png" style="display: block; margin: auto;" />
+</p>
+
+All species show very low amounts of sugars, fat and saturated fatty
+acids, which is good for heart health. For anyone looking for a low carb
+diet, fish is the answer. They have very low carbohydrate per serving.
+
+Futher analysis, including responsive charts can be found here.
