@@ -14,7 +14,7 @@ This project looks to answer two thing:
 
 1.  Is seafood environmentally sustainable?
 2.  Does it pack the nutrients to replace red meat diet?
-3.  
+
 ###  The full project with **code** can be found [here.](https://github.com/rickyboshe/Fisheries/blob/main/Fisheries/Fisheries.md)
 
 #  Summary
