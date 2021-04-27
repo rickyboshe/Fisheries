@@ -3,7 +3,11 @@ Fisheries
 Fredrick Boshe
 09/04/2021
 
+<center>
+
 # Seafood: The Ultimate Food 🐟?
+
+</center>
 
 As more people are opting against red meat diet for plant based and sea
 food, this might be a good time to analyze aquatic food sources. The
@@ -15,24 +19,27 @@ has made sea food a favourable alternative diet also termed as
 [“pescatarian
 diet”](https://www.medicalnewstoday.com/articles/323907#:~:text=What%20is%20a%20pescatarian%20diet%3F&text=In%20the%20pescatarian%20diet%2C%20a,and%20fish%20products%20may%20enhance).
 
-This project looks to answer two thing:
+Utilizing visualization, this project explores:
 
-1.  Is seafood environmentally sustainable?
-2.  Does it pack the nutrients to replace red meat diet?
+1.  Sustainability of seafood. **Goal:** Exploring how sustainable the
+    fishing rates are across the fishing regions in USA. Environmentally
+    and Fish populations.
+2.  Nutritional value of seafood. **Goal:** Establishing the nutritional
+    value of fish species found across US marine. Compare species,
+    identify trends and comparison with other food sources e.g. beef.
 
-We shall be utilizing the fisheries management dataset from the
-[National Oceanic and Atmostpheric Administration
+This project primarily analyzes the fisheries management dataset from
+the [National Oceanic and Atmostpheric Administration
 (NOAA)](https://www.fishwatch.gov/resources). Accessing the latest data
 using their **FishWatch API**.
 
-This is my first time attempting to work with APIs to access data. A
-learning curve.
+If you are not familiar with pulling data using APIs, this project might
+be helpful as this was alo my first attempt utilizing an API.
 
-### Acessing the data
+#### Acessing the data
 
 ``` r
 #Create a function to request the endpoint and receive a dataframe converted from JSON
-
 fish<- function(endpoint) {
   url <- modify_url("https://www.fishwatch.gov", path = endpoint)
   response<-GET(url)
@@ -65,7 +72,11 @@ var_name<-var_name%>%
 ```
 
 We have reduced it to the essential variables we shall use to evaluate
-some of the sea food being monitored by NOAA.
+some of the seafood being monitored by NOAA.
+
+Using REGEX function to parse througfh the coloumns to remove html tags
+and make the data easier to sort through. This is the major first step
+to cleaning the dataset.
 
 ``` r
 #The data contains html tags throughout the columns. Clean them out
@@ -75,7 +86,9 @@ cleanFun <- function(htmlString) {
 fish.df<-data.frame(map(fish.df, cleanFun))
 ```
 
-### Data Cleaning and Manipulation
+### Data Cleaning
+
+#### Fishing Rates
 
 ``` r
 #Categorize population(naive categorization using the first instance of the words "Above", "Unknown" and "Below")
@@ -134,8 +147,6 @@ How the fishing rates were coded:
 3.  **Unknown**: This single observation is for the **California Market
     Squid** whose fishing rate and populations have not be estimated by
     NOAA.
-
-<!-- end list -->
 
 ``` r
 #Categorize the environmental impact of species
@@ -246,39 +257,44 @@ fish.df<-fish.df%>%
   rename("serving weights (g)" = Serving.Weight)
 ```
 
-### Regional Fishing
+### Analysis
+
+#### Regional Fishing
 
 ``` r
-fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, fill=noaa.fisheries.region))+
+fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, 
+                           fill=noaa.fisheries.region))+
   geom_bar()+
   theme_minimal()+
-  theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
+  theme(plot.title = element_text(color="black", size=14, 
+                                  face="bold", hjust = 0.5),
         axis.text.x = element_blank(),
         axis.ticks = element_blank(),
         legend.title = element_blank(),
-        axis.title.x = element_text(color="black", size=12, face="bold"),
-        axis.title.y = element_text(color="black", size=12, face="bold"))+
+        axis.title.x = element_text(color="black", size=12),
+        axis.title.y = element_text(color="black", size=12))+
   scale_y_continuous(expand = c(0, 0))+
   labs(title = "Distribution of fish species within \nNOAA fisheries regions",
        x="Region",
-       y="No of Species")
+       y="No. of Species")
 
 mrg <- list(l = 10, r = 40,
           b = 15, t = 100,
           pad = 0)
 
+#ggplotly allows for an interactive chart
 fig1<-ggplotly(fig1)%>%layout(margin=mrg)
 ```
 
-<img src="Fisheries_files/figure-gfm/fig2-1.png" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/fig1-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
 <br></br> The most species are found in the Greater Atlantic area while
 the least are found in the Pacific Island fishery region.
 
 This means chances are, most of the fish people consume in the US comes
-from the Greater Atlantic area\! But does this mean the region is
-subject to over fishing?
+from the Greater Atlantic area! But does this mean the region is subject
+to over fishing?
 
-### Regional Fishing Rates
+#### Regional Fishing Rates
 
 We can examine how the fishing rates are in every region in the US. The
 goal is to identify regions that are experiencing over fishing or are
@@ -297,11 +313,12 @@ fig2<-plotdata%>%
   ggplot(aes(x=noaa.fisheries.region, y=pct, fill=fishing_rate))+
   geom_bar(stat = "identity", position = "fill")+
   theme_minimal()+
-  theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
+  theme(plot.title = element_text(color="black", size=14, 
+                                  face="bold", hjust = 0.5),
         axis.ticks = element_blank(),
         legend.title = element_blank(),
         axis.title.x = element_text(color="black", size=12, face="bold"),
-        axis.title.y = element_text(color="black", size=12, face="bold"))+
+        axis.title.y = element_text(color="black", size=12))+
   scale_y_continuous(breaks = seq(0, 1, .2),label = percent)+
   geom_text(aes(label = lbl), size = 3, 
             position = position_stack(vjust = 0.5))+
@@ -321,7 +338,7 @@ fig2<- ggplotly(fig2)%>% add_annotations( text="Fishing Rate",
 fig2
 ```
 
-<img src="Fisheries_files/figure-gfm/env-1.png" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/fig2-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
 
 The majority of fishing regions are experiencing stable fishing rates,
 well within recommended levels for existing populations. The Greater
@@ -331,11 +348,11 @@ to the other regions (20%).
 <br></br>
 
 |                                                         Blue Mussel                                                         |                                                                                                                                                          Sable Fish                                                                                                                                                          |
-| :-------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|:---------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 |    <img src="https://www.fishwatch.gov/sites/default/files/blue_mussel.png" alt="blue mussel" width="600" height="150"/>    |                                                                                              <img align="center" src="https://www.fishwatch.gov/sites/default/files/sablefish.png" alt="sable fish" width="400" height="100"/>                                                                                               |
 | The blue mussel has been observed to have a net benefit on the environment while boasting rich levels of protein (21% RDA). | The sable fish is available year round and is a great source for protein (24% RDA), low on carbs (0% RDA) and sodium (4% RDA). But the species is under monitoring from federal and state authorities to ensure its fishing has minimal impact on the environment. It also has relatively high levels of selenium (66% RDA). |
 
-### How nutritious is seafood?
+#### Seafood Nutrition
 
 ``` r
 #Using the RDA information from US Dietary guidelines. 
@@ -356,24 +373,38 @@ fish.df<-fish.df %>%
 ```
 
 ``` r
-fig4<-plot_ly(data = fish_longer, x=~nutrient, y =~percent, color =~nutrient, 
-        type = "box", textposition = "auto", hoverinfo = "text",
-        hovertext = paste("Species :", fish_longer$species.name,"<br> RDA :", 
-                          fish_longer$percent))%>% 
-  layout(title="<b>Fish calories and nutritional values \n(percentage RDA)<b>",
-         xaxis = list(title='',
-                      ticktext = list("Fat", "Saturated Fatty Acids", "Carbohydrate",
-                                      "Sugars","Protein", "Cholesterol", 
-                                      "Dietary Fiber", "Sodium", "Selenium"), 
-      tickvals = list("fat_RDA", "s.fat_RDA", "carbs_RDA", "sugars_RDA", "protein_RDA",
-                      "cholesterol_RDA", "fiber_RDA", "sodium_RDA", "selenium_RDA"),
-      tickangle = -45),
-      yaxis = list(title='Percentage RDA'))%>%
-  hide_legend()
-fig4
+fish_longer<-fish.df%>%
+  pivot_longer(cols = c(fat_RDA, s.fat_RDA, carbs_RDA, sugars_RDA, protein_RDA,
+                        cholesterol_RDA, fiber_RDA, sodium_RDA, selenium_RDA),
+               names_to="nutrient",
+               values_to="percent")
+
+fig3<-fish_longer%>%ggplot(aes(x=nutrient, y=percent, fill=nutrient))+
+  geom_boxplot()+
+  theme_minimal()+
+  theme(plot.title = element_text(color="black", size=14, 
+                                  face="bold", hjust = 0.5),
+        axis.text.x = element_text(angle = 45,),
+        axis.ticks = element_blank(),
+        legend.title = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(color="black", size=12),
+        legend.position = "none")+
+  labs(title="Seafood nutritional value",
+       x= "Nutrient",
+       y= "Percentage RDA")+
+  scale_x_discrete(breaks=c("carbs_RDA","cholesterol_RDA","fat_RDA","fiber_RDA",
+                            "protein_RDA", "s.fat_RDA","selenium_RDA", 
+                            "sodium_RDA","sugars_RDA" ),
+                   labels=c("Carbohydrate", "Cholesterol", "Fat", "Dietary Fiber", 
+                            "Protein","Saturated Fatty Acids", "Selenium",
+                            "Sodium", "Sugars"))
+
+fig3<-ggplotly(fig3)
+fig3
 ```
 
-<img src="Fisheries_files/figure-gfm/fig4-1.png" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/fig3-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
 
 It looks like most fish species are rich in protein, selenium and
 cholesterol. With the exception of Atlantic Bigeye Tuna and Pacific Blue
@@ -405,40 +436,88 @@ fig6<-fish_longer%>%ggplot(aes(x=calories, y=percent, color=nutrient, group=spec
   facet_wrap(~nutrient, labeller = labeller(nutrient=nut.labs),
              scales="free_y")
 
-mrg2 <- list(l = 10, r = 40,
-          b = 10, t = 100,
-          pad = 0)
-
+#Plotly tends to mess up axis titles from ggplots. One might have to tweak around the margins to get the perfect layout
 fig6<- ggplotly(fig6, tooltip = c("species"))%>%
-  layout(margin=mrg2)%>%
+  layout(margin = list(l = 70, r = 30, b = 20, t = 80),
+           yaxis = list(title = paste0(c(rep("&nbsp;", 10),
+                                         "",
+                                         rep("&nbsp;", 30),
+                                         rep("\n&nbsp;", 3)),
+                                       collapse = "")))%>%
   hide_legend()
 
 fig6
 ```
 
-<img src="Fisheries_files/figure-gfm/quad-1.png" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/fig6-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
 
 It would appear that the calories of fish have weak negative
 relationship with the amount of carbohydrates and sugars. While there is
 no significant relationship between fish calories with dietary fibers,
 cholesterol and selenium. But there is a strong relationship between
-fish calories and Fat (r = 0.91), Saturated fat (r = 0.90) and Protein
+fish calories and fat (r = 0.91), saturated fat (r = 0.90) and protein
 (r = 0.39).
 
 So for people trying to avoid fat and saturated fatty acids, fish might
-not be the ideal dish for you.
+not be the ideal dish for you. But for protein loading gym enthusiasts?
+seafood is a good snack.
 
-<img src="Fisheries_files/figure-gfm/corr-1.png" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/corr-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
 
 <br></br>
 
-<center>
+#### Comperative Quadrant
 
-##### How do fish calories compare to fat, saturated fatty acids, carbs and protein?
+Looking at the four significant nutrients found in seafood i.e. fat,
+saturated fats, carbohydrates and protein, cholesterol, i utilized
+quadrants to group seafood in 4 groups based on their average
+nutritional value.
 
-</center>
+``` r
+#fat
+cal_mean<-mean(fish.df$calories, na.rm = TRUE)
+f.per_mean<-mean(fish.df$fat_RDA, na.rm = TRUE)
 
-<img src="Fisheries_files/figure-gfm/quadrant-1.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant-2.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant-3.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant-4.png" style="display: block; margin: auto;" />
+fig8<-fish.df%>%
+  mutate(quadrant = case_when(calories > cal_mean & fat_RDA > f.per_mean ~ "Q1",
+                              calories <= cal_mean & fat_RDA > f.per_mean ~ "Q2",
+                              calories <= cal_mean& fat_RDA <= f.per_mean ~ "Q3",
+                              TRUE                                         ~ "Q4"))%>%
+  ggplot(aes(x=calories, y=fat_RDA, color= quadrant, group=species)) +
+  geom_point() +
+  lims(x=c(50,250),y=c(1,20)) +
+  theme_minimal()+
+  theme(plot.title = element_text(color="black", size=13, face="bold",
+                                          hjust = 0.5),
+        axis.title.x = element_text(color="black", size=12),
+        axis.title.y = element_text(color="black", size=12))+
+  labs(title="Calories vs Fat \n(average values)",
+       x= "Calories",
+       y= "Percentage RDA") +
+  geom_vline(xintercept = cal_mean) + 
+  geom_hline(yintercept = f.per_mean)+
+  annotate("text", x=62, y=2, label= "Low calories \nLow fat", size=3) + 
+  annotate("text", x =62, y=17, label = "Low calories \nHigh fat", size=3)+
+  annotate("text", x=230, y=2, label= "High calories \nLow fat", size=3) + 
+  annotate("text", x =230, y=17, label = "High calories \nHigh fat", size=3)
+
+mrg3 <- list(l = 10, r = 10,
+          b = 10, t = 100,
+          pad = 0)
+
+fig8<- ggplotly(fig8, tooltip = "species")%>% #the tooltip allows highlighting of species
+  layout(margin=mrg3)
+
+fig8
+```
+
+<img src="Fisheries_files/figure-gfm/quadrant1-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
+
+``` r
+#Repeat this for any nutrient of interest
+```
+
+<img src="Fisheries_files/figure-gfm/quadrant2-1.png" width="100%" height="100%" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant2-2.png" width="100%" height="100%" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant2-3.png" width="100%" height="100%" style="display: block; margin: auto;" />
 
 Above graphs depict a **nutritional value quadrant** for the fish
 species found within the NOAA region. For all intents and purposes, the
