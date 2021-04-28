@@ -267,43 +267,38 @@ fish.df<-fish.df%>%
 ### Analysis
 #### Regional Fishing
 
-```{r region, include=TRUE, out.width='100%', out.height='100%', results="hide", fig.align='center'}
-fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, 
-                           fill=noaa.fisheries.region))+
-  geom_bar()+
+```{r region, include=TRUE, fig.height= 6.5, fig.width= 9, fig.align='center'}
+fig1<-fish.df%>%
+  count(noaa.fisheries.region)%>%
+  ggplot(aes(x=reorder(noaa.fisheries.region, n), y = n, 
+             fill=noaa.fisheries.region))+
+  geom_bar(stat = "identity")+
   theme_minimal()+
   theme(plot.title = element_text(color="black", size=14, 
                                   face="bold", hjust = 0.5),
-        axis.text.x = element_blank(),
         axis.ticks = element_blank(),
-        legend.title = element_blank(),
         axis.title.x = element_text(color="black", size=12),
-        axis.title.y = element_text(color="black", size=12))+
+        axis.title.y = element_blank(),
+        legend.position = "none")+
   scale_y_continuous(expand = c(0, 0))+
+  coord_flip() +
   labs(title = "Distribution of fish species within \nNOAA fisheries regions",
        x="Region",
-       y="No. of Species")
+       y="Number of Species")
 
 mrg <- list(l = 10, r = 40,
-          b = 15, t = 100,
+          b = 15, t = 70,
           pad = 0)
 
 #ggplotly allows for an interactive chart
-fig1<-ggplotly(fig1)%>%layout(margin=mrg)
+fig1<-ggplotly(fig1)%>%
+  layout(margin=mrg)%>%
+  style(hoverinfo = 'none')
 
-```
-
-```{r fig1, include=TRUE, out.width='100%', out.height='100%', results="hide", fig.align="center", echo=FALSE }
-#Plotly to make the chart more interactive
-fig1<- ggplotly(fig1)%>% add_annotations(text="NOAA Fishery Region", 
-                                         xref="paper", yref="paper",
-                                         x=1.02, xanchor="left",
-                                         y=0.9, yanchor="bottom", 
-                                         legendtitle=TRUE, showarrow=FALSE)%>%
-  layout(legend=list(y=0.9, yanchor="top"))
 fig1
-
 ```
+
+
 <br></br>
 The most species are found in the Greater Atlantic area while the least are found in the Pacific Island fishery region.
 
@@ -313,7 +308,7 @@ This means chances are, most of the fish people consume in the US comes from the
 #### Regional Fishing Rates
 We can examine how the fishing rates are in every region in the US. The goal is to identify regions that are experiencing over fishing or are within recommended fishing levels.
 
-```{r fig2, Include=TRUE, out.width='100%', out.height='100%', fig.align="center", message=FALSE, warning=FALSE}
+```{r fig2, Include=TRUE, fig.height= 7, fig.width= 8.5, fig.align="center", message=FALSE, warning=FALSE}
 #Availability vs Fishing rate
 plotdata <- fish.df%>%
   drop_na(fishing_rate)%>%
@@ -382,7 +377,7 @@ fish.df<-fish.df %>%
 ```
 
 
-```{r fig3, include=TRUE, out.width='100%', out.height='100%', fig.align="center", warning=FALSE, message=FALSE}
+```{r fig3, include=TRUE, fig.height= 7, fig.width= 8.5,fig.align="center", warning=FALSE, message=FALSE}
 
 fish_longer<-fish.df%>%
   pivot_longer(cols = c(fat_RDA, s.fat_RDA, carbs_RDA, sugars_RDA, protein_RDA,
@@ -415,7 +410,7 @@ fig3<-ggplotly(fig3)
 fig3
 ```
 
-```{r fig4, include=FALSE, out.width='100%', out.height='100%', fig.align="center", message=FALSE, warning=FALSE}
+```{r fig4, include=FALSE, fig.height= 7, fig.width= 8.5, fig.align="center", message=FALSE, warning=FALSE}
 
 fig4<-plot_ly(data = fish_longer, x=~nutrient, y =~percent, color =~nutrient, 
         type = "box", textposition = "auto", hoverinfo = "text",
@@ -443,7 +438,7 @@ It looks like most fish species are rich in protein, selenium and cholesterol. W
 
 All species show very low amounts of sugars, fat and saturated fatty acids, which is good for heart health. For anyone looking for a low carb diet, fish is the answer. They have very low carbohydrate per serving. 
 
-```{r fig5, include=FALSE,out.height='100%', out.width='100%', fig.align="center", message=FALSE, warning=FALSE }
+```{r fig5, include=FALSE, fig.height= 7, fig.width= 8.5, fig.align="center", message=FALSE, warning=FALSE }
 #Plotly to make the chart more interactive
 fig5<- ggplotly(fig3)%>%
   add_annotations( text="Nutrition", xref="paper", yref="paper",
@@ -456,7 +451,7 @@ fig5
 
 ```
 
-```{r fig6, include=TRUE, out.height='100%', out.width='100%',fig.align="center", message=FALSE, warning=FALSE}
+```{r fig6, include=TRUE, fig.height= 7, fig.width= 8.5, fig.align="center", message=FALSE, warning=FALSE}
 
 #Trend of fish calories and their nutrients
 nut.labs<-c("Fat", "Saturated Fatty Acids", "Carbohydrate", "Sugars",
@@ -516,7 +511,7 @@ strong_cor<-cor_tib%>%
 
 ```
 
-```{r corr, include=TRUE, out.height='100%', out.width='100%', fig.align="center", message=FALSE, warning=FALSE, echo=FALSE }
+```{r corr, include=TRUE, fig.height= 7, fig.width= 8, fig.align="center", message=FALSE, warning=FALSE, echo=FALSE }
 
 #Plot matrix table to see strength of relationships
 fig7 <- ggcorrplot(
@@ -532,7 +527,7 @@ fig7
 
 ####  Comperative Quadrant
 Looking at the four significant nutrients found in seafood i.e. fat, saturated fats, carbohydrates and protein, cholesterol, i utilized quadrants to group seafood in 4 groups based on their average nutritional value. 
-```{r quadrant1, include=TRUE, out.height='100%', out.width='100%', fig.align="center"}
+```{r quadrant1, include=TRUE, fig.height= 6, fig.width= 8, fig.align="center"}
 #fat
 cal_mean<-mean(fish.df$calories, na.rm = TRUE)
 f.per_mean<-mean(fish.df$fat_RDA, na.rm = TRUE)
@@ -572,7 +567,7 @@ fig8
 ```
 
 
-```{r quadrant2, echo=FALSE, out.height='100%', out.width='100%', fig.align="center"}
+```{r quadrant2, echo=FALSE, fig.height= 6, fig.width= 8, fig.align="center"}
 #S.fat
 cal_mean<-mean(fish.df$calories, na.rm = TRUE)
 sf.per_mean<-mean(fish.df$s.fat_RDA, na.rm = TRUE)

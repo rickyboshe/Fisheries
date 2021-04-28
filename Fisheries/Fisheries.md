@@ -262,31 +262,38 @@ fish.df<-fish.df%>%
 #### Regional Fishing
 
 ``` r
-fig1<-fish.df%>%ggplot(aes(x=noaa.fisheries.region, 
-                           fill=noaa.fisheries.region))+
-  geom_bar()+
+fig1<-fish.df%>%
+  count(noaa.fisheries.region)%>%
+  ggplot(aes(x=reorder(noaa.fisheries.region, n), y = n, 
+             fill=noaa.fisheries.region))+
+  geom_bar(stat = "identity")+
   theme_minimal()+
   theme(plot.title = element_text(color="black", size=14, 
                                   face="bold", hjust = 0.5),
-        axis.text.x = element_blank(),
         axis.ticks = element_blank(),
-        legend.title = element_blank(),
         axis.title.x = element_text(color="black", size=12),
-        axis.title.y = element_text(color="black", size=12))+
+        axis.title.y = element_blank(),
+        legend.position = "none")+
   scale_y_continuous(expand = c(0, 0))+
+  coord_flip() +
   labs(title = "Distribution of fish species within \nNOAA fisheries regions",
        x="Region",
-       y="No. of Species")
+       y="Number of Species")
 
 mrg <- list(l = 10, r = 40,
-          b = 15, t = 100,
+          b = 15, t = 70,
           pad = 0)
 
 #ggplotly allows for an interactive chart
-fig1<-ggplotly(fig1)%>%layout(margin=mrg)
+fig1<-ggplotly(fig1)%>%
+  layout(margin=mrg)%>%
+  style(hoverinfo = 'none')
+
+fig1
 ```
 
-<img src="Fisheries_files/figure-gfm/fig1-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/region-1.png" style="display: block; margin: auto;" />
+
 <br></br> The most species are found in the Greater Atlantic area while
 the least are found in the Pacific Island fishery region.
 
@@ -338,7 +345,7 @@ fig2<- ggplotly(fig2)%>% add_annotations( text="Fishing Rate",
 fig2
 ```
 
-<img src="Fisheries_files/figure-gfm/fig2-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/fig2-1.png" style="display: block; margin: auto;" />
 
 The majority of fishing regions are experiencing stable fishing rates,
 well within recommended levels for existing populations. The Greater
@@ -404,7 +411,7 @@ fig3<-ggplotly(fig3)
 fig3
 ```
 
-<img src="Fisheries_files/figure-gfm/fig3-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/fig3-1.png" style="display: block; margin: auto;" />
 
 It looks like most fish species are rich in protein, selenium and
 cholesterol. With the exception of Atlantic Bigeye Tuna and Pacific Blue
@@ -449,7 +456,7 @@ fig6<- ggplotly(fig6, tooltip = c("species"))%>%
 fig6
 ```
 
-<img src="Fisheries_files/figure-gfm/fig6-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/fig6-1.png" style="display: block; margin: auto;" />
 
 It would appear that the calories of fish have weak negative
 relationship with the amount of carbohydrates and sugars. While there is
@@ -462,7 +469,7 @@ So for people trying to avoid fat and saturated fatty acids, fish might
 not be the ideal dish for you. But for protein loading gym enthusiasts?
 seafood is a good snack.
 
-<img src="Fisheries_files/figure-gfm/corr-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/corr-1.png" style="display: block; margin: auto;" />
 
 <br></br>
 
@@ -511,13 +518,13 @@ fig8<- ggplotly(fig8, tooltip = "species")%>% #the tooltip allows highlighting o
 fig8
 ```
 
-<img src="Fisheries_files/figure-gfm/quadrant1-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/quadrant1-1.png" style="display: block; margin: auto;" />
 
 ``` r
 #Repeat this for any nutrient of interest
 ```
 
-<img src="Fisheries_files/figure-gfm/quadrant2-1.png" width="100%" height="100%" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant2-2.png" width="100%" height="100%" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant2-3.png" width="100%" height="100%" style="display: block; margin: auto;" />
+<img src="Fisheries_files/figure-gfm/quadrant2-1.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant2-2.png" style="display: block; margin: auto;" /><img src="Fisheries_files/figure-gfm/quadrant2-3.png" style="display: block; margin: auto;" />
 
 Above graphs depict a **nutritional value quadrant** for the fish
 species found within the NOAA region. For all intents and purposes, the
