@@ -10,12 +10,10 @@ has made sea food a favourable alternative diet also termed as
 [“pescatarian
 diet”](https://www.medicalnewstoday.com/articles/323907#:~:text=What%20is%20a%20pescatarian%20diet%3F&text=In%20the%20pescatarian%20diet%2C%20a,and%20fish%20products%20may%20enhance).
 
-This project looks to answer two thing:
+Utilizing visualization, this project explores:
 
-1.  Is seafood environmentally sustainable?
-2.  Does it pack the nutrients to replace red meat diet?
-
-###  The full project with **code** can be found [here.](https://github.com/rickyboshe/Fisheries/blob/main/Fisheries/Fisheries.md)
+1.  Sustainability of seafood. Goal: Exploring how sustainable the fishing rates are across the fishing regions in USA. Environmentally and Fish populations.
+2.  Nutritional value of seafood. Goal: Establishing the nutritional value of fish species found across US marine. Compare species, identify trends and comparison with other food sources e.g. beef.
 
 #  Summary
 According to the data from
@@ -50,8 +48,7 @@ dietary allowance in the USA.
 <img src="Fisheries/Fisheries_files/figure-gfm/fig4-1.png" style="display: block; margin: auto;" />
 </p>
 
-All species show very low amounts of sugars, fat and saturated fatty
-acids, which is good for heart health. For anyone looking for a low carb
-diet, fish is the answer. They have very low carbohydrate per serving.
+All species show very low amounts of sugars, fat and saturated fatty acids, which is good for heart health. For anyone looking for a low carb diet, fish is the answer. They have very low carbohydrate per serving.
 
-Futher analysis, including responsive charts can be found here.
+Futher analysis, including **responsive charts** can be [**found here**](https://rickyboshe.github.io/projects/Fisheries.html).
+
