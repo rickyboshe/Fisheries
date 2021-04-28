@@ -445,15 +445,19 @@ fig6<-fish_longer%>%ggplot(aes(x=calories, y=percent, color=nutrient, group=spec
 
 #Plotly tends to mess up axis titles from ggplots. One might have to tweak around the margins to get the perfect layout
 fig6<- ggplotly(fig6, tooltip = c("species"))%>%
-  layout(margin = list(l = 70, r = 30, b = 20, t = 80),
-           yaxis = list(title = paste0(c(rep("&nbsp;", 10),
-                                         "",
-                                         rep("&nbsp;", 30),
-                                         rep("\n&nbsp;", 3)),
-                                       collapse = "")))%>%
   hide_legend()
 
-fig6
+
+#This helps find out how plotly has listed the annotations
+#str(fig6[['x']][['layout']][['annotations']]) 
+
+#Locates the x position of the yaxis titles
+#fig6[['x']][['layout']][['annotations']][[2]][['x']]
+
+#move the y-axis title more left and x-axis title lower
+fig6[['x']][['layout']][['annotations']][[2]][['x']] <- -0.05
+fig6[['x']][['layout']][['annotations']][[1]][['y']] <- -0.04
+fig6 %>% layout(margin = list(l = 75, t=75))
 ```
 
 <img src="Fisheries_files/figure-gfm/fig6-1.png" style="display: block; margin: auto;" />
@@ -537,3 +541,81 @@ calories relate to your diet of choice. Also to debunk any misguided
 information one might have had prior.
 
 <br></br>
+
+## Comparative analysis
+
+To be able to compare against other food sources, we have to bring in
+data from other online sources.
+
+### Vegetables
+
+Accessing [vegetable food nutrition
+data](https://data.world/adamhelsinger/food-nutrition-information/workspace/file?filename=NutritionalFacts_Fruit_Vegetables_Seafood.csv)
+data from data.world. You can download the whole CSV file and clean it
+on R, but i prefer querying (SQL) the data i need on data.world and only
+downloading parts that i need.
+
+``` sql
+--SQL Code to only get top 4 vegetables by calories
+SELECT * 
+FROM nutritionalfacts_fruit_vegetables_seafood
+WHERE food_type LIKE "%vegetables%"
+ORDER BY calories DESC
+LIMIT 4;
+```
+
+### Fruits
+
+``` sql
+--SQL Code to only get top 4 vegetables by calories
+SELECT * 
+FROM nutritionalfacts_fruit_vegetables_seafood
+WHERE food_type LIKE "%fruits%"
+ORDER BY calories DESC
+LIMIT 4;
+```
+
+For Animal nutrition information, i collected information from the [USDA
+National Nutrient
+Database](https://data.world/craigkelly/usda-national-nutrient-db).
+
+### Beef
+
+``` sql
+--SQL Code to only get top 4 beef by calories
+SELECT * 
+FROM nndb_flat 
+WHERE foodgroup LIKE "%beef%" AND shortdescrip LIKE "%meat%"
+ORDER BY energy_kcal DESC
+LIMIT 4;
+```
+
+### Pork
+
+``` sql
+--SQL Code to only get top 4 pork products by calories
+SELECT * 
+FROM nndb_flat 
+WHERE foodgroup LIKE "%pork%" AND shortdescrip LIKE "%meat%"
+ORDER BY energy_kcal DESC
+LIMIT 4;
+```
+
+### Poultry
+
+``` sql
+--SQL Code to only get top 4 poultry products by calories
+SELECT * 
+FROM nndb_flat 
+WHERE foodgroup LIKE "%poultry%" AND shortdescrip LIKE "%meat%"
+ORDER BY energy_kcal DESC
+LIMIT 4;
+```
+
+Import the trimmed data and finish manipulating the values. Finally
+subset a dataset that will contain 4 different fruits, vegetables,
+seafood and data on beef, pork, and poultry.
+
+The goal is to have comparable values. I selected fruits and vegetables
+with the highest calories. This will be the same with the fish species
+selected.
