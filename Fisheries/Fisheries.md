@@ -276,6 +276,7 @@ fig1<-fish.df%>%
         legend.position = "none")+
   scale_y_continuous(expand = c(0, 0))+
   coord_flip() +
+  geom_col(alpha = 0.8, width = 0.85) +
   labs(title = "Distribution of fish species within \nNOAA fisheries regions",
        x="Region",
        y="Number of Species")
@@ -329,6 +330,7 @@ fig2<-plotdata%>%
   scale_y_continuous(breaks = seq(0, 1, .2),label = percent)+
   geom_text(aes(label = lbl), size = 3, 
             position = position_stack(vjust = 0.5))+
+  geom_col(alpha = 0.8, width = 0.85) +
   labs(title = "Fishing Rate by Fishing Region",
        x="",
        y="Percent")
@@ -618,4 +620,24 @@ seafood and data on beef, pork, and poultry.
 
 The goal is to have comparable values. I selected fruits and vegetables
 with the highest calories. This will be the same with the fish species
-selected.
+selected. There is substantial cleaning, re-arranging, renaming and
+binding dataframes. thankfully, dplyr and tidyverse have all the tools
+for this.
+
+``` r
+#cleaned and merged dataframe
+head(nutrition,5)
+```
+
+    ##                     food               serving calories fat_g sodium_g carb_g
+    ## 1        Pacific Sardine                   100      217 12.37      918      0
+    ## 2 Atlantic Chub Mackerel                   100      205 13.89       90      0
+    ## 3      Atlantic Mackerel                   100      205 13.89       90      0
+    ## 4              Sablefish                   100      195 15.30       56      0
+    ## 5                  Apple  1 large (242 g/8 oz)      130  0.00        0     34
+    ##   fiber_g sugar_g protein_g selenium_mcg
+    ## 1       0       0     24.58         52.6
+    ## 2       0       0     18.60         44.1
+    ## 3       0       0     18.60         44.1
+    ## 4       0       0     13.41         36.5
+    ## 5       5      25      1.00           NA
