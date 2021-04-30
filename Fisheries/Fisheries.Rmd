@@ -203,7 +203,7 @@ fish.df<-fish.df%>%
 
 #Fiber
 ##This column has one value in mg and the rest are in g
-unique(fish.df$Fiber..Total.Dietary)
+#unique(fish.df$Fiber..Total.Dietary)
 fish.df$Fiber..Total.Dietary<-parse_number(fish.df$Fiber..Total.Dietary)
 
 ##convert the mg value to g
@@ -226,7 +226,7 @@ fish.df<-fish.df%>%
 
 #Selenium
 ##Some values are in percentage of daily intake and some in mcg
-unique(fish.df$Selenium)
+#unique(fish.df$Selenium)
 fish.df$Selenium <-parse_number(fish.df$Selenium) 
 fish.df$Selenium<-ifelse(fish.df$Selenium==160, 55*1.6, fish.df$Selenium) #55 mcg is the USA daily intake for adults and children above 14.
 
@@ -264,7 +264,7 @@ fish.df<-fish.df%>%
 ```
 
 
-### Analysis
+### Analysis: Environmental Impact
 #### Regional Fishing
 
 ```{r region, include=TRUE, fig.height= 6.5, fig.width= 9, fig.align='center', warning=FALSE, message=FALSE}
@@ -355,9 +355,15 @@ The majority of fishing regions are experiencing stable fishing rates, well with
 | Blue Mussel  | Sable Fish |
 | :-----------: | :-----------: |
 | <img src="https://www.fishwatch.gov/sites/default/files/blue_mussel.png" alt="blue mussel" width="600" height="150"/>  | <img align="center" src="https://www.fishwatch.gov/sites/default/files/sablefish.png" alt="sable fish" width="400" height="100"/> |
-| The blue mussel has been observed to have a net benefit on the environment while boasting rich levels of protein (21% RDA). | The sable fish is available year round and is a great source for protein (24% RDA), low on carbs (0% RDA) and sodium (4% RDA). But the species is under monitoring from federal and state authorities to ensure its fishing has minimal impact on the environment. It also has relatively high levels of selenium (66% RDA). |
+| The blue mussel has been observed to have a net benefit on the environment while boasting rich levels of protein (21% RDA). | The sable fish is available year round and is a great source for protein (24% RDA), low on carbs (0% RDA) and sodium (4% RDA). But the species is under monitoring from federal and state authorities to ensure its fishing has minimal impact on the environment. |
+<br></br>
+
+According to [research](https://www.imas.utas.edu.au/news/news-items/beef,-lamb,-lobster-or-fish-fisheries-study-shows-impact-of-food-choice-on-carbon-emissions#:~:text=lobster%20or%20fish%3F-,Fisheries%20study%20shows%20impact%20of%20food%20choice%20on%20carbon%20emissions,alternatives%20like%20beef%20or%20lamb.) from Canadian scientists, seafood has one of the lowest carbon footprint as compared to other food sources. It is estimated that in the US, each kilo of fish resulted in 1.6 kilos of carbon. Meanwhile, the environmental cost of red meat such as beef and lamb, which is estimated to range from 50 kilos to as much as 750 kilos of carbon per kilo of meat.
+
+Seafood is inherently more environmentally friendly as compared to red meat. Its fishing levels, according to NOAA in the US, are well within recommended levels allowing fish populations to sustainably thrive. 
 
 
+### Analysis: Nutritional Value
 ####  Seafood Nutrition
 
 ```{r seafood, include=TRUE, warning=FALSE, message=FALSE}
@@ -489,7 +495,7 @@ fig6<- ggplotly(fig6, tooltip = c("species"))%>%
 #move the y-axis title more left and x-axis title lower
 fig6[['x']][['layout']][['annotations']][[2]][['x']] <- -0.05
 fig6[['x']][['layout']][['annotations']][[1]][['y']] <- -0.04
-fig6 %>% layout(margin = list(l = 75, t=75))
+fig6 %>% layout(margin = list(l = 65, t=75))
 
 ```
 
@@ -530,10 +536,9 @@ fig7
 
 <br></br>
 
-
 ####  Comperative Quadrant
 Looking at the four significant nutrients found in seafood i.e. fat, saturated fats, carbohydrates and protein, cholesterol, i utilized quadrants to group seafood in 4 groups based on their average nutritional value. 
-```{r quadrant1, include=TRUE, fig.height= 6, fig.width= 8, fig.align="center"}
+```{r quadrant1, include=TRUE}
 #fat
 cal_mean<-mean(fish.df$calories, na.rm = TRUE)
 f.per_mean<-mean(fish.df$fat_RDA, na.rm = TRUE)
@@ -547,19 +552,20 @@ fig8<-fish.df%>%
   geom_point() +
   lims(x=c(50,250),y=c(1,20)) +
   theme_minimal()+
-  theme(plot.title = element_text(color="black", size=13, face="bold",
+  theme(plot.title = element_text(color="black", size=12, face="bold",
                                           hjust = 0.5),
-        axis.title.x = element_text(color="black", size=12),
-        axis.title.y = element_text(color="black", size=12))+
+        axis.title.x = element_text(color="black", size=10),
+        axis.title.y = element_text(color="black", size=10),
+        legend.position = "none")+
   labs(title="Calories vs Fat \n(average values)",
        x= "Calories",
        y= "Percentage RDA") +
   geom_vline(xintercept = cal_mean) + 
   geom_hline(yintercept = f.per_mean)+
-  annotate("text", x=62, y=2, label= "Low calories \nLow fat", size=3) + 
-  annotate("text", x =62, y=17, label = "Low calories \nHigh fat", size=3)+
-  annotate("text", x=230, y=2, label= "High calories \nLow fat", size=3) + 
-  annotate("text", x =230, y=17, label = "High calories \nHigh fat", size=3)
+  annotate("text", x=65, y=1.7, label= "Low calories \nLow fat", size=2.5) + 
+  annotate("text", x =65, y=17, label = "Low calories \nHigh fat", size=2.5)+
+  annotate("text", x=230, y=1.7, label= "High calories \nLow fat", size=2.5) + 
+  annotate("text", x =230, y=17, label = "High calories \nHigh fat", size=2.5)
 
 mrg3 <- list(l = 10, r = 10,
           b = 10, t = 100,
@@ -568,12 +574,6 @@ mrg3 <- list(l = 10, r = 10,
 fig8<- ggplotly(fig8, tooltip = "species")%>% #the tooltip allows highlighting of species
   layout(margin=mrg3)
 
-fig8
-#Repeat this for any nutrient of interest
-```
-
-
-```{r quadrant2, echo=FALSE, fig.height= 6, fig.width= 8, fig.align="center"}
 #S.fat
 cal_mean<-mean(fish.df$calories, na.rm = TRUE)
 sf.per_mean<-mean(fish.df$s.fat_RDA, na.rm = TRUE)
@@ -585,21 +585,22 @@ fig9<-fish.df%>%
                               TRUE                            ~ "Q4"))%>%
   ggplot(aes(x=calories, y=s.fat_RDA, color= quadrant, group=species)) +
   geom_point() +
-  lims(x=c(0,250),y=c(-1,20)) +
+  lims(x=c(0,250),y=c(1,20)) +
   theme_minimal()+
-  theme(plot.title = element_text(color="black", size=13, face="bold",
+  theme(plot.title = element_text(color="black", size=12, face="bold",
                                           hjust = 0.5),
-        axis.title.x = element_text(color="black", size=12),
-        axis.title.y = element_text(color="black", size=12))+
+        axis.title.x = element_text(color="black", size=10),
+        axis.title.y = element_text(color="black", size=10),
+        legend.text=element_text(size=8))+
   labs(title="Calories vs Saturated Fatty Acids \n(average values)",
        x= "Calories",
-       y= "Percentage RDA") +
+       y= "") +
   geom_vline(xintercept = cal_mean) + 
   geom_hline(yintercept = sf.per_mean)+
-  annotate("text", x=20, y=2, label= "Low calories \nLow sat. fat", size=3) + 
-  annotate("text", x =20, y=17, label = "Low calories \nHigh sat. fat", size=3)+
-  annotate("text", x=230, y=2, label= "High calories \nLow sat. fat", size=3) + 
-  annotate("text", x =230, y=17, label = "High calories \nHigh sat. fat", size=3)
+  annotate("text", x=25, y=2, label= "Low calories \nLow sat. fat", size=2.5) + 
+  annotate("text", x =25, y=16, label = "Low calories \nHigh sat. fat", size=2.5)+
+  annotate("text", x=210, y=2, label= "High calories \nLow sat. fat", size=2.5) + 
+  annotate("text", x =210, y=16, label = "High calories \nHigh sat. fat", size=2.5)
 
 mrg3 <- list(l = 10, r = 10,
           b = 10, t = 100,
@@ -607,10 +608,16 @@ mrg3 <- list(l = 10, r = 10,
 
 fig9<- ggplotly(fig9, tooltip = "species")%>%
   layout(margin=mrg3)
+#Repeat this for any nutrient of interest
+```
 
+```{r quadplot, echo=FALSE, fig.show="hold", out.width="50%"}
+fig8
 fig9
+```
 
 
+```{r quadrant2, echo=FALSE, fig.height= 6, fig.width= 8, fig.align="center"}
 #carbs
 cal_mean<-mean(fish.df$calories, na.rm = TRUE)
 c.per_mean<-mean(fish.df$carbs_RDA, na.rm = TRUE)
@@ -624,19 +631,20 @@ fig10<-fish.df%>%
   geom_point() +
   lims(x=c(25,250),y=c(-1,5)) +
   theme_minimal()+
-  theme(plot.title = element_text(color="black", size=13, face="bold",
+  theme(plot.title = element_text(color="black", size=12, face="bold",
                                           hjust = 0.5),
-        axis.title.x = element_text(color="black", size=12),
-        axis.title.y = element_text(color="black", size=12))+
+        axis.title.x = element_text(color="black", size=10),
+        axis.title.y = element_text(color="black", size=10),
+        legend.position = "none")+
   labs(title="Calories vs Carbohydrates \n(average values)",
        x= "Calories",
        y= "Percentage RDA") +
   geom_vline(xintercept = cal_mean) + 
   geom_hline(yintercept = c.per_mean)+
-  annotate("text", x=40, y=-0.5, label= "Low calories \nLow carbohydrate", size=3) + 
-  annotate("text", x =40, y=3, label = "Low calories \nHigh carbohydrate", size=3)+
-  annotate("text", x=230, y=-0.5, label= "High calories \nLow carbohydrate", size=3) + 
-  annotate("text", x =230, y=3, label = "High calories \nHigh carbohydrate", size=3)
+  annotate("text", x=40, y=-0.5, label= "Low calories \nLow carbs", size=2.5) + 
+  annotate("text", x =40, y=3, label = "Low calories \nHigh carbs", size=2.5)+
+  annotate("text", x=230, y=-0.5, label= "High calories \nLow carbs", size=2.5) + 
+  annotate("text", x =230, y=3, label = "High calories \nHigh carbs", size=2.5)
 
 mrg3 <- list(l = 10, r = 10,
           b = 10, t = 100,
@@ -645,7 +653,6 @@ mrg3 <- list(l = 10, r = 10,
 fig10<- ggplotly(fig10, tooltip = "species")%>%
   layout(margin=mrg3)
 
-fig10
 
 #protein
 cal_mean<-mean(fish.df$calories, na.rm = TRUE)
@@ -660,19 +667,20 @@ fig11<-fish.df%>%
   geom_point() +
   lims(x=c(25,250),y=c(-1,80)) +
   theme_minimal()+
-  theme(plot.title = element_text(color="black", size=13, face="bold",
+  theme(plot.title = element_text(color="black", size=12, face="bold",
                                           hjust = 0.5),
-        axis.title.x = element_text(color="black", size=12),
-        axis.title.y = element_text(color="black", size=12))+
+        axis.title.x = element_text(color="black", size=10),
+        axis.title.y = element_text(color="black", size=10),
+        legend.text=element_text(size=8))+
   labs(title="Calories vs Protein \n(average values)",
        x= "Calories",
-       y= "Percentage RDA") +
+       y= "") +
   geom_vline(xintercept = cal_mean) + 
   geom_hline(yintercept = p.per_mean)+
-  annotate("text", x=35, y=17, label= "Low calories \nLow protein", size=3) + 
-  annotate("text", x =35, y=65, label = "Low calories \nHigh protein", size=3)+
-  annotate("text", x=230, y=17, label= "High calories \nLow protein", size=3) + 
-  annotate("text", x =230, y=65, label = "High calories \nHigh protein", size=3)
+  annotate("text", x=45, y=17, label= "Low calories \nLow protein", size=2.5) + 
+  annotate("text", x =45, y=65, label = "Low calories \nHigh protein", size=2.5)+
+  annotate("text", x=230, y=17, label= "High calories \nLow protein", size=2.5) + 
+  annotate("text", x =230, y=65, label = "High calories \nHigh protein", size=2.5)
 
 mrg3 <- list(l = 10, r = 10,
           b = 10, t = 100,
@@ -681,6 +689,10 @@ mrg3 <- list(l = 10, r = 10,
 fig11<- ggplotly(fig11, tooltip = "species")%>%
   layout(margin=mrg3)
 
+```
+
+```{r quadplot2, echo=FALSE, fig.show="hold", out.width="50%"}
+fig10
 fig11
 ```
 
@@ -691,7 +703,7 @@ As human diet differ across communities, some might be looking for different lev
 
 <br></br>
 
-## Comparative analysis
+## Analysis: Seafood vs Other Food Sources
 To be able to compare against other food sources, we have to bring in data from other online sources. 
 
 ### Vegetables
@@ -760,19 +772,24 @@ poultry<-read_csv("C:/Users/ricky/Documents/GitHub/Fisheries/Fisheries/Poultry.c
 
 fruits<-fruits%>%
   select(-20:-24)%>%
-  select(-3,-5,-7:-9,-11,-13,-16:-19)
+  select(-3,-5,-7:-9,-11,-13,-16:-19)%>%
+  mutate(category="Fruit")
 vegetables<-vegetables%>%
   select(-20:-24)%>%
-  select(-3,-5,-7:-9,-11,-13,-16:-19)
+  select(-3,-5,-7:-9,-11,-13,-16:-19)%>%
+  mutate(category="Vegetable")
 beef<-beef%>%
   select(-1:-3,-5:-7)%>%
-  select(-8:-22,-24:-39)
+  select(-8:-22,-24:-39)%>%
+  mutate(category="Beef")
 pork<-pork%>%
   select(-1:-3,-5:-7)%>%
-  select(-8:-22,-24:-39)
+  select(-8:-22,-24:-39)%>%
+  mutate(category="Pork")
 poultry<-poultry%>%
   select(-1:-3,-5:-7)%>%
-  select(-8:-22,-24:-39)
+  select(-8:-22,-24:-39)%>%
+  mutate(category="Poultry")
 
 greens<-rbind(fruits, vegetables)
 meat<-bind_rows(beef, pork, poultry)
@@ -793,13 +810,14 @@ meat<-meat%>%
   rename(calories=energy_kcal)
 
 greens<-greens%>%
-  mutate(selenium_mcg=NA)
+  mutate(selenium_mcg=NA)%>%
+  mutate()
 meat<-meat%>%
   mutate(sodium_g=NA)
 
 
 meat<-meat%>%
-  select(1,2,3,5,10,6,8,7,4,9)
+  select(1,2,3,5,11,6,8,7,4,9,10)
 
 food1<-rbind(greens, meat)
 
@@ -807,6 +825,7 @@ food1<-rbind(greens, meat)
 fish.df2<-fish.df%>%
   select(2,13,3,6,14,4,7,15,10,12)%>%
   unique()%>%
+  filter(species!="Atlantic Chub Mackerel")%>%
   slice_max(order_by = calories, n = 4)
 
 fish.df2<-fish.df2%>%
@@ -814,15 +833,122 @@ fish.df2<-fish.df2%>%
          fat_g=`fat (g/ser)`, sodium_g=`sodium (mg/ser)`,
          carb_g=`carbs (g/ser)`, fiber_g=`fiber (g/ser)`,
          sugar_g=`sugars (g/ser)`, protein_g=`protein (g/ser)`,
-         selenium_mcg=`selenium (mcg/ser)`)
+         selenium_mcg=`selenium (mcg/ser)`)%>%
+  mutate(category="seafood")
 
 nutrition<-rbind(fish.df2, food1)
 head (nutrition, 10)
 ```
 
-```{r nut, include=TRUE}
-#cleaned and merged dataframe
-head(nutrition,5)
+```{r fig12, include=TRUE, fig.align='center', fig.height=6, fig.width=12}
+#Convert their nutritional values to RDA
+nutrition<-nutrition%>%
+  mutate(fat_RDA=fat_g*100/93,
+         carbs_RDA=carb_g*100/130,
+         sugars_RDA=sugar_g*100/25,
+         protein_RDA=protein_g*100/56,
+         fiber_RDA=fiber_g*100/30,
+         sodium_RDA=sodium_g*100/1300,
+         selenium_RDA=selenium_mcg*100/55)
+
+nutrition<-nutrition %>% 
+  mutate_at(vars(ends_with("RDA")), funs(round(., 2)))
+
+nutrition_longer<-nutrition%>%
+  pivot_longer(cols = c(12:18),
+               names_to = "nutrient",
+               values_to = "value")
+
+fig12<-nutrition_longer%>%
+  ggplot(aes(y=food, x=nutrient, fill=value))+
+  geom_tile(colour="white",size=0.25, na.rm = TRUE)+
+  theme_minimal()+
+  scale_fill_distiller(palette = "YlOrRd", direction=+1)+
+  labs(x = "", 
+       y = "",
+       title = "Nutrition: Seafood vs Others",
+       fill="Percentage RDA")+
+  theme(plot.title = element_text(hjust = 0.5, size = 14, face="bold",
+                                  margin = margin(t = 0, r = 0, b = 10, l = 0)),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, 
+                                                    b = 0, l = 0)),
+        axis.title.x = element_text(margin = margin(t = 0, r = 0, 
+                                                    b = 10, l = 0)))
+
+fig12
+
+#If you prefer an interactive heatmap, plotly works great. Just remove the coment # from the code below
+
+#vals <- unique(rescale(c(nutrition_longer$value)))
+#o <- order(vals, decreasing = FALSE)
+#cols <- col_numeric("Greens", domain = NULL)(vals)
+#colz <- setNames(data.frame(vals[o], cols[o]), NULL)
+
+
+#plot4 <- plot_ly(nutrition_longer,
+    #x = ~nutrient, y = ~food,
+    #z = ~value, colorscale = colz, type = "heatmap"
+#)%>% layout(legend=list(title="Percentage RDA"),
+            #xaxis=list(title=""),
+           #yaxis=list(title=""))
+```
+**Note:** Grey tiles indicate observations that are lacking data. One might scrap the web for missing data and fill them in. For consistency, i only used data from the sources i listed earlie (which has some missing values for some observations).
+
+```{r fig13, include=TRUE, fig.height= 7, fig.width= 8.5, fig.align="center", message=FALSE, warning=FALSE}
+
+#Trend of fish calories and their nutrients
+nut.labs<-c("Fat", "Carbohydrate", "Sugars","Protein", 
+            "Dietary Fiber", "Sodium", "Selenium")
+names(nut.labs)<-c("fat_RDA", "carbs_RDA", "sugars_RDA", "protein_RDA",
+                    "fiber_RDA", "sodium_RDA", "selenium_RDA")
+
+fig13<-nutrition_longer%>%ggplot(aes(x=calories, y=value, 
+                                     color=category, group=food))+
+  geom_point()+
+  theme_minimal()+
+  theme(plot.title = element_text(color="black", size=14, face="bold",hjust = 0.5),
+        legend.title = element_blank(),
+        axis.title.x = element_text(color="black", size=12),
+        axis.title.y = element_text(color="black", size=12),
+        panel.spacing.y = unit(1, "lines"))+
+  labs(title="Relationship between Calories and Nutrients",
+       x= "Calories",
+       y= "Percentage RDA")+
+  facet_wrap(~nutrient, labeller = labeller(nutrient=nut.labs),
+             scales="free_y", ncol = 2)
+
+#Plotly tends to mess up axis titles from ggplots. One might have to tweak around the margins to get the perfect layout
+fig13<- ggplotly(fig13, tooltip = c("food"))
+
+
+#This helps find out how plotly has listed the annotations
+#str(fig13[['x']][['layout']][['annotations']]) 
+
+#Locates the x position of the yaxis titles
+#fig13[['x']][['layout']][['annotations']][[2]][['x']]
+
+#move the y-axis title more left and x-axis title lower
+fig13[['x']][['layout']][['annotations']][[2]][['x']] <- -0.04
+fig13[['x']][['layout']][['annotations']][[1]][['y']] <- -0.04
+fig13 %>% layout(margin = list(l = 65, t=75))
 
 
 ```
+<br></br>
+
+From the two visualization, the following observations are seen:
+
+**Fruits:** They are a great source for sugars, dietary fiber and carbohydrates. Plant based produce has always been rich in starch and complex carbohydrates.
+
+**Vegetables:** They rank high in dietary fiber and carbohydrates. Like fruits, they have very little fat and protein while also registering the least amount of calories. 
+
+**Red Meat:** Beef has high amounts of protein and substantial fat. Similar to pork and poultry. red meat also has the most calories of the food groups analyzed.
+
+**Seafood:** Has similar amount of carbs to red meat but with less calories. Same with dietary fiber and sugars. So if you are looking to cut your calorie intake but maintain levels of carbs, fiber and sugars, seafood is a great alternative to red meat. 
+Seafood also has less fat compared to red meat while showing similar or slightly more protein levels. Lower calories, less fat and similar protein levels? Seafood is a **great** alternative to red meat, nutritionally! 
+
+## Closing Remarks
+Seafood in the USA is not facing dangers of over-fishing allowing for sustainable fish populations to thrive. Seafood has significantly lower levels of carbon footprint as compared to livestock keeping and crop producing. **Environmentally**, a seafood diet helps the planet more than a red meat diet.
+
+
+At the same time, seafood is showing similar or better nutritional values for protein, dietary fiber and sugars with less fat and calories. Anyone looking to maintain these nutritional values will do much better consuming seafood diet than red meat. 
