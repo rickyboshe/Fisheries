@@ -360,6 +360,12 @@ The majority of fishing regions are experiencing stable fishing rates, well with
 
 According to [research](https://www.imas.utas.edu.au/news/news-items/beef,-lamb,-lobster-or-fish-fisheries-study-shows-impact-of-food-choice-on-carbon-emissions#:~:text=lobster%20or%20fish%3F-,Fisheries%20study%20shows%20impact%20of%20food%20choice%20on%20carbon%20emissions,alternatives%20like%20beef%20or%20lamb.) from Canadian scientists, seafood has one of the lowest carbon footprint as compared to other food sources. It is estimated that in the US, each kilo of fish resulted in 1.6 kilos of carbon. Meanwhile, the environmental cost of red meat such as beef and lamb, which is estimated to range from 50 kilos to as much as 750 kilos of carbon per kilo of meat.
 
+
+![](Fisheries_files/figure-gfm/Infograph.PNG)
+
+
+<br></br>
+
 Seafood is inherently more environmentally friendly as compared to red meat. Its fishing levels, according to NOAA in the US, are well within recommended levels allowing fish populations to sustainably thrive. 
 
 

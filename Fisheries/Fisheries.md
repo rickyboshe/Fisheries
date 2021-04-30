@@ -100,7 +100,7 @@ fish.df<-fish.df%>%
 
     ##     Population Species
     ## 1 Above target      72
-    ## 2 Below target      21
+    ## 2 Below target      22
     ## 3      Unknown      13
 
 ``` r
@@ -111,7 +111,7 @@ fish.df<-fish.df%>%
 
     ##   Availability Species
     ## 1     Seasonal       6
-    ## 2   Year round     108
+    ## 2   Year round     109
 
 For fish that are caught fresh in long periods of the year i.e. 6-8
 months of the year, and are canned or frozen year long, are coded as
@@ -132,7 +132,7 @@ fish.df<-fish.df%>%
 
     ##   Fishing rate Species
     ## 1         Over      14
-    ## 2       Stable      91
+    ## 2       Stable      92
     ## 3      Unknown       1
 
 How the fishing rates were coded:
@@ -354,6 +354,10 @@ kilo of fish resulted in 1.6 kilos of carbon. Meanwhile, the
 environmental cost of red meat such as beef and lamb, which is estimated
 to range from 50 kilos to as much as 750 kilos of carbon per kilo of
 meat.
+
+![](Fisheries_files/figure-gfm/Infograph.PNG)
+
+<br></br>
 
 Seafood is inherently more environmentally friendly as compared to red
 meat. Its fishing levels, according to NOAA in the US, are well within
